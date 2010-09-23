@@ -10,8 +10,8 @@
                         hierarchy = attribute.split('.')
                         name = hierarchy.last.humanize
 
-	                    if !@list[0].class.resource.nil? and (@list[0].attribute_names.include?(attribute) or (@list[0].class.reflections[hierarchy.first.to_sym]))
-	                        list_header_sortable(name, self.send("#{@list[0].class.resource}_path"), attribute, params[:conditions])
+	                    if !@list[0].class.crud_star_options[:resource].nil? and (@list[0].attribute_names.include?(attribute) or (@list[0].class.reflections[hierarchy.first.to_sym]))
+	                        list_header_sortable(name, self.send(CrudStar::Utility.path_for_resources(@list[0].class)), attribute, params[:conditions])
 	                    else
 	                        name
 	                    end
@@ -27,4 +27,4 @@
     </tbody>
 </table>
 
-<%= list_pagination_links(@list, self.send("#{@list[0].class.resource}_path")) if !@list[0].class.resource.nil? %>
+<%= list_pagination_links(@list, self.send(CrudStar::Utility.path_for_resources(@list[0].class))) if !@list[0].class.crud_star_options[:resource].nil? %>

@@ -11,7 +11,8 @@ module CrudStar
     private
 
       def link(text, target, attributes = {})
-        super(text, target, {'data-remote' => 'true'})
+        attributes['data-remote'] = true
+        super(text, target, attributes)
       end
   end
 end

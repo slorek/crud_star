@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
     <head>
-        <title><%= CrudStar::Engine.config.application_name %> Admin</title>
+        <title><%= CrudStar::Engine.config.application_name %></title>
         
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         
@@ -21,27 +21,36 @@
     </head>
     
     <body>
-
         <div id="header">
             <h1><%= CrudStar::Engine.config.application_name %></h1>
-            <div id="login"><p>Logged in as: <%= session[:username] %> | <%= link_to 'Logout »', send(CrudStar::Engine.config.url_path + '_logout_url') %></p></div>
+            <div id="login"><p>Logged in as: <%= session[:username] %> | <%= link_to 'Logout »', send(CrudStar::Utility.path_for_resource(:logout)) %></p></div>
             <div class="clear"></div>
         </div>
-    
+		
         <div id="navi">
             <ul id="navtabs">
             	
 				<%
                     subnav = nil
 
-				    CrudStar::Engine.config.navigation[session[:role]].each do |tab|
+				    CrudStar::Engine.config.navigation.each do |tab|
 
-                        if controller.selected_tab == tab
-                            subnav = children
+                        if controller.controller_name.intern == tab
+                            #subnav = children
                         end
-                %>
-				    <li<%= controller.selected_tab == tab ? ' id="current"' : nil %>><%= link_to(tab.to_s, send(CrudStar::Engine.config.url_path + '_' + tab.to_s + '_url')) %></li>
+
+						if tab == :dashboard
+				%>
+				    <li<%= raw (controller.controller_name == 'index' ? ' id="current"' : nil) %>><%= link_to('Dashboard', self.send(CrudStar::Utility.path_for_resource(tab))) %></li>
 				<%
+                
+						else
+	            %>
+				    <li<%= raw (controller.controller_name.intern == tab ? ' id="current"' : nil) %>><%= link_to(tab.to_s.singularize.camelize.constantize.model_name.human.pluralize, self.send(CrudStar::Utility.path_for_resources(tab))) %></li>
+				<%
+    
+						end
+
 				    end
                 %>
             </ul>

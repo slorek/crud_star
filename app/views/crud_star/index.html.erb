@@ -1,11 +1,11 @@
 <div id="content">
 	
-    <h2><%= controller.selected_menu_option or controller.selected_tab %></h2>
+    <h2><%= controller.selected_menu_option or controller.model.model_name.human.pluralize %></h2>
 	
 	<%= display_action_help(controller.model.name, 'index') %>
 	
 	<% if flash[:deleted] %>
-       <p class="alert-ok">The <%= controller.model.human_name.downcase %> has been deleted.</p>
+       <p class="alert-ok">The <%= controller.model.model_name.human.downcase %> has been deleted.</p>
     <% end %>
 	
 	<% if flash[:notify] %>
@@ -31,13 +31,13 @@
 			     
 				<%= render :partial => @list_filter_partial %>
 				 
-			    <p class="alert-tip">There are no <%= controller.model.human_name.pluralize.downcase %> which match your filter criteria.</p>
+			    <p class="alert-tip">There are no <%= controller.model.model_name.human.pluralize.downcase %> which match your filter criteria.</p>
 				 
 			<% else %>
 			
-	            <p class="alert-tip">There are no <%= controller.model.human_name.pluralize.downcase %> added yet.<%
+	            <p class="alert-tip">There are no <%= controller.model.model_name.human.pluralize.downcase %> added yet.<%
 				 if controller.permissions[session[:role]].include? 'new' %>
-				    Now might be a good time to <%= link_to 'add a ' + controller.model.human_name.downcase, self.send("new_#{controller.model.resource.singularize}_path") %>!<%
+				    Now might be a good time to <%= link_to 'add a ' + controller.model.model_name.human.downcase, self.send(CrudStar::Utility.path_for_new_resource(controller.model)) %>!<%
 				 end %></p>
 			
 			<% end %>
@@ -55,7 +55,7 @@
 		<%
 		  if controller.permissions[session[:role]].include? 'new'
         %>		
-            <li><%= link_to 'Add a ' + controller.model.human_name, self.send("new_#{controller.model.resource.singularize}_path") %></li>
+            <li><%= link_to 'Add a ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_new_resource(controller.model)) %></li>
 		<%
 		  end
 		%>

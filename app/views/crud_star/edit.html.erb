@@ -1,10 +1,10 @@
 <div id="content">
 	
-    <h2>Edit <%= controller.model.human_name %></h2>
+    <h2>Edit <%= controller.model.model_name.human %></h2>
 	
 	<%= display_action_help(controller.controller_name, 'edit') %>
 	
-	<% form_tag self.send(controller.model.resource.singularize + '_path', @item), :method => :put, :multipart => true do -%>
+	<% form_tag self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :put, :multipart => true do -%>
 	
 	<% associations = [] %>
 	
@@ -88,10 +88,10 @@
 <div id="sidebar">
     <h5>Resources</h5>
     <ul id="sidebar-nav">
-        <li><%= link_to 'Cancel', self.send(controller.model.resource.singularize + '_path', @item, :cancel => 1) %></li>
+        <li><%= link_to 'Cancel', self.send(CrudStar::Utility.path_for_resource(controller.model), @item, :cancel => 1) %></li>
 		
 		<% if controller.permissions[session[:role]].include? 'destroy' %>
-            <li><%= link_to 'Delete ' + controller.model.human_name, self.send(controller.model.resource.singularize + '_path', @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.human_name.downcase + '?' %></li>
+            <li><%= link_to 'Delete ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.model_name.human.downcase + '?' %></li>
 		<% end %>
 		
 		<%

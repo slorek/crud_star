@@ -7,11 +7,8 @@ module CrudStar
     before_filter :validate_login
     before_filter :validate_access
     
-    attr_reader 'model'
-    
-    # Hide these controller methods so they are not as accessible as actions.
-    # Cannot set as protected or private due to inheritance and view dependance.
-    hide_action ['model']
+    helper_method :model
+    hide_action :model
   
     # Default 'index' action.
     #
@@ -32,8 +29,6 @@ module CrudStar
     # page    Page number to view.
     #
     def index(conditions = {}, join_tables = {})
-    
-      unless self.model.nil?
       
         conditions ||= {}
         params[:conditions] ||= {}
@@ -128,7 +123,6 @@ module CrudStar
           render(:partial => @list_partial + '.html', :layout => false, :content_type => 'text/html')
           rendered = true
         end
-      end
     
       # Render the template outside of above condition in case there's no model.
       if rendered.nil?
@@ -227,10 +221,10 @@ module CrudStar
             session[:objects][self.model.name.underscore][id] = nil
           
             flash[:updated] = true
-            redirect_to(self.send(self.model.resource.singularize + '_path', @item))
+            redirect_to(send(CrudStar::Utility.path_for_resource(self.model), @item))
           else
             flash[:errors] = flash[:errors] | @item.errors.full_messages
-            redirect_to(self.send('edit_' + self.model.resource.singularize + '_path', @item))
+            redirect_to(send('edit_' + CrudStar::Utility.path_for_resource(self.model), @item))
           end
         
         else
@@ -275,7 +269,7 @@ module CrudStar
           session[:objects][self.model.name.underscore][params[:id]] = nil
         
           flash[:created] = true
-          redirect_to(self.send(self.model.resource.singularize + '_path', @item))
+          redirect_to(self.send(CrudStar::Utility.path_for_resource(self.model), @item))
         else
           render(:template => get_template(:filename => :new))
         end
@@ -302,13 +296,13 @@ module CrudStar
       
         if @item.destroy
           flash[:deleted] = true
-          redirect_to(self.send(self.model.resource + '_path'))
+          redirect_to(CrudStar::Utility.path_for_resources(self.model))
         else
           flash[:errors] = flash[:errors] | @item.errors.full_messages
-          redirect_to(self.send(self.model.resource.singularize + '_path', @item))
+          redirect_to(self.send(CrudStar::Utility.path_for_resource(self.model), @item))
         end
       else
-        redirect_to(self.send(self.model.resource + '_path'))
+        redirect_to(CrudStar::Utility.path_for_resources(self.model))
       end
     end
   
@@ -369,7 +363,7 @@ module CrudStar
         else
         
           # Determine whether to re-direct to the new or edit action.
-          url = @item.id.nil? ? self.send('new_' + self.model.resource.singularize + '_path', :id => @item_id) : self.send('edit_' + self.model.resource.singularize + '_path', @item, association.klass.name.underscore.to_sym => params[association.klass.name.underscore.to_sym])
+          url = @item.id.nil? ? self.send(CrudStar::Utility.path_for_new_resource(self.model), :id => @item_id) : self.send(CrudStar::Utility.path_for_edit_resource(self.model), @item, association.klass.name.underscore.to_sym => params[association.klass.name.underscore.to_sym])
         
           redirect_to(url)
         end
@@ -430,17 +424,21 @@ module CrudStar
         else
         
           # Determine whether to re-direct to the new or edit action.
-          url = @item.id.nil? ? self.send('new_' + self.model.resource.singularize + '_path', :id => @item_id) : self.send('edit_' + self.model.resource.singularize + '_path', @item, association.klass.name.underscore.to_sym => params[association.klass.name.underscore.to_sym])
+          url = @item.id.nil? ? self.send(CrudStar::Utility.path_for_new_resource(self.model), :id => @item_id) : self.send(CrudStar::Utility.path_for_edit_resource(self.model), @item, association.klass.name.underscore.to_sym => params[association.klass.name.underscore.to_sym])
         
           redirect_to(url)
         end
       end
     end
-  
+    
+    
+    def model
+      controller_name.singularize.camelize.constantize
+    end
   
     # Internal utility methods.
     protected
-    
+      
       # Get a template name to use. Allows over-riding of default template by
       # controller.
       #

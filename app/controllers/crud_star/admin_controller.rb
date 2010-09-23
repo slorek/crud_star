@@ -12,12 +12,9 @@ module CrudStar
   
     layout 'crud_star'
   
-    # Set up the required controller attributes.
-    attr_reader 'selected_tab', 'selected_menu_option'
-  
     # Hide these controller methods so they are not as accessible as actions.
     # Cannot set as protected or private due to inheritance and view dependance.
-    hide_action ['selected_tab', 'selected_menu_option', 'sidebar_actions', 'permissions']
+    hide_action ['sidebar_actions', 'permissions']
   
     def sidebar_actions
       {:admin => {}}

@@ -1,12 +1,12 @@
 <div id="content">
 	
-    <h2><%= controller.model.human_name %>: <%= get_value(@item, controller.model.default_attribute) %></h2>
+    <h2><%= controller.model.model_name.human %>: <%= get_value(@item, controller.model.crud_star_options[:default_attribute]) %></h2>
     
     <% if flash[:updated] %>
-       <p class="alert-ok">Changes to the <%= controller.model.human_name.downcase %> have been saved.</p>
+       <p class="alert-ok">Changes to the <%= controller.model.model_name.human.downcase %> have been saved.</p>
     
     <% elsif flash[:created] %>
-       <p class="alert-ok">The <%= controller.model.human_name.downcase %> has been added.</p>
+       <p class="alert-ok">The <%= controller.model.model_name.human.downcase %> has been added.</p>
 	<% end %>
 	
 	<% if flash[:notify] %>
@@ -32,7 +32,7 @@
         %>
 				<tr>
 					<th><%= attribute.split('.').last.humanize %></th>
-					<td><%= display_value(@item, attribute) || '<em>Undefined</em>' %></td>
+					<td><%= display_value(@item, attribute) || raw('<em>Undefined</em>') %></td>
 				</tr>
 		<%
 		    else
@@ -74,7 +74,7 @@
 			<h3><%= attribute.titleize %></h3>
 			
 			<% if @item.send(attribute).empty? %>
-			   <p>There are no <%= attribute.humanize.downcase %> associated with this <%= controller.model.human_name.downcase %>.</p>
+			   <p>There are no <%= attribute.humanize.downcase %> associated with this <%= controller.model.model_name.human.downcase %>.</p>
 			<%
               else
                 @list = @item.send(attribute)
@@ -100,12 +100,12 @@
         <%
           if controller.permissions[session[:role]].include? 'edit'
         %>
-		  <li><%= link_to 'Edit ' + controller.model.human_name, self.send('edit_' + controller.model.resource.singularize + '_path', @item) %></li>
+		  <li><%= link_to 'Edit ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_edit_resource(controller.model), @item) %></li>
         <%
 		  end
 		  if controller.permissions[session[:role]].include? 'destroy'
         %>
-		  <li><%= link_to 'Delete ' + controller.model.human_name, self.send(controller.model.resource.singularize + '_path', @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.human_name.downcase + '?' %></li>
+		  <li><%= link_to 'Delete ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.model_name.human.downcase + '?' %></li>
 		<%
 		  end
 		%>

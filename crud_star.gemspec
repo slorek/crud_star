@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Steve Lorek"]
-  s.date = %q{2010-09-21}
+  s.date = %q{2010-09-23}
   s.description = %q{CrudStar}
   s.email = %q{steve@stevelorek.com}
   s.extra_rdoc_files = [
@@ -40,8 +40,12 @@ Gem::Specification.new do |s|
      "app/views/crud_star/new.html.erb",
      "app/views/crud_star/show.html.erb",
      "app/views/layouts/crud_star.html.erb",
+     "config/routes.rb",
      "lib/crud_star.rb",
+     "lib/crud_star/acts_as_crud_star/base.rb",
      "lib/crud_star/engine.rb",
+     "lib/rails/generators/crud_star/crud_star_config_generator.rb",
+     "lib/rails/generators/crud_star/templates/initializer.rb",
      "public/images/crud_star/ajax_loading.gif",
      "public/images/crud_star/body-bg.jpg",
      "public/images/crud_star/bullet-blue.gif",
@@ -90,7 +94,7 @@ Gem::Specification.new do |s|
      "public/images/crud_star/sort_desc.gif",
      "public/images/crud_star/submenu-bg.jpg",
      "public/images/crud_star/tralt-bg.jpg",
-     "public/javascripts/crud_star/ajax.js",
+     "public/javascripts/crud_star/application.js",
      "public/stylesheets/crud_star/admin.css",
      "public/stylesheets/crud_star/blue.css",
      "public/stylesheets/crud_star/green.css",
@@ -107,10 +111,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{CrudStar}
-  s.test_files = [
-    "test/helper.rb",
-     "test/test_crud_star.rb"
-  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION

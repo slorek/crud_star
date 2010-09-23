@@ -39,7 +39,7 @@ module CrudStar
   
     def get_value(item, attribute)
     
-      hierarchy = attribute.split('.')
+      hierarchy = attribute.to_s.split('.')
     
       count = 0
     
@@ -54,8 +54,8 @@ module CrudStar
         count += 1
       end
     
-      if value.nil? and !item.respond_to?(attribute.to_sym) and item.class.respond_to?(:default_attribute)
-        value = get_value(item, item.class.send('default_attribute'))
+      if value.nil? and !item.respond_to?(attribute.to_sym) and item.class.respond_to?(:crud_star_options)
+        value = get_value(item, item.class.crud_star_options[:default_attribute])
       end
     
       value
@@ -65,7 +65,7 @@ module CrudStar
   
     def get_association(model, attribute)
     
-      hierarchy = attribute.split('.')
+      hierarchy = attribute.to_s.split('.')
     
       count = 0
     
@@ -86,38 +86,35 @@ module CrudStar
   
     # Formats the value of an attribute for display.
     #
-    # TODO: Make output HTML safe.
-    #
     def display_value(item, attribute)
     
       value = get_value(item, attribute)
-      
-      value
     
-      # unless value.nil?
-      # 
-      #   case value.class.name
-      #   
-      #     when 'ActiveSupport::TimeWithZone'
-      #       value.strftime("%B %d, %Y %I:%M %p")
-      #     when 'Date'
-      #       value.strftime("%B %d, %Y")
-      #     when 'String', 'Fixnum'
-      #       value
-      #     when 'BigDecimal'
-      #       value.to_s.gsub(/0+$/, '').gsub(/\.$/, '')
-      #     when 'TrueClass'
-      #       'Yes'
-      #     when 'FalseClass'
-      #       'No'
-      #     else
-      #       unless value.class.resource.nil?
-      #         value.class.method_defined?('default_attribute') ? link_to(get_value(value, value.class.default_attribute), self.send(value.class.resource.singularize + '_path', value)) : value
-      #       else
-      #         value.class.method_defined?('default_attribute') ? get_value(value, value.class.default_attribute) : value
-      #       end
-      #     end
-      # end
+      unless value.nil?
+      
+        case value.class.name
+        
+          when 'Time'
+            value.strftime("%B %d, %Y %I:%M %p")
+          when 'Date'
+            value.strftime("%B %d, %Y")
+          when 'String', 'Fixnum'
+            value
+          when 'BigDecimal'
+            value.to_s.gsub(/0+$/, '').gsub(/\.$/, '')
+          when 'TrueClass'
+            'Yes'
+          when 'FalseClass'
+            'No'
+          else
+            #value.class.name
+            unless value.class.crud_star_options[:resource].nil?
+              link_to(get_value(value, value.class.crud_star_options[:default_attribute]), self.send(CrudStar::Utility.path_for_resource(value.class), value))
+            else
+              get_value(value, value.class.crud_star_options[:default_attribute])
+            end
+          end
+      end
     end
     
   
@@ -163,7 +160,7 @@ module CrudStar
             if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_select_associated.html.erb'))
               tag = render(:partial => get_partial(item.class.name.pluralize.underscore, 'select_associated'), :locals => {:field_id => field_id, :field_name => field_name, :selected => value})
             else
-              tag = select_tag(field_name, options_for_select(association.klass.all.collect {|c| [c.send(c.class.default_attribute), c.to_param] }.insert(0, ''), item.send(attribute).to_param))
+              tag = select_tag(field_name, options_for_select(association.klass.all.collect {|c| [c.send(c.class.crud_star_options[:default_attribute]), c.to_param] }.insert(0, ''), item.send(attribute).to_param))
             end
           
           else
@@ -255,7 +252,9 @@ module CrudStar
     # TODO: non-belongs_to fields
     #
     def display_filter(item, attribute)
-    
+      
+      logger.info File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_filter_' + attribute.gsub(/\./, '_') + '.html.erb')
+      
       if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_filter_' + attribute.gsub(/\./, '_') + '.html.erb'))
           
         @item = item
@@ -281,7 +280,7 @@ module CrudStar
             if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_select_associated.html.erb'))
               tag = render(:partial => get_partial(item.class.name.pluralize.underscore, 'select_associated'), :locals => {:field_id => field_id, :field_name => field_name})
             else
-              tag = select_tag(field_name, options_for_select(association.klass.all.collect { |c| [c.send(c.class.default_attribute), c.to_param] }.insert(0, ''), selected))
+              tag = select_tag(field_name, options_for_select(association.klass.all.collect { |c| [c.send(c.class.crud_star_options[:default_attribute]), c.to_param] }.insert(0, ''), selected))
             end
           end
         

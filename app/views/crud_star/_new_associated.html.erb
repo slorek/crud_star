@@ -11,7 +11,7 @@
 	
 	<div id="associated_form">
 		<div id="associated_existing">
-			<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + controller.model.resource + '_path'), :method => :post, :html => {:action => self.send('add_associated_' + controller.model.resource + '_path'), :method => 'post'}) do -%>
+			<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => :post, :html => {:action => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => 'post'}) do -%>
 		       <fieldset>
 		        
 		            <%= hidden_field_tag('association_name', association.name.to_s) %>
@@ -19,7 +19,7 @@
 					
 					<%
 					   options = ['Please Select']
-                       association.klass.all.each {|p| options << [ get_value(p, association.klass.default_attribute), p.id ] }
+                       association.klass.all.each {|p| options << [ get_value(p, association.klass.crud_star_options[:default_attribute]), p.id ] }
                     %>
 					
 					<%= select_tag(association.klass.name.underscore + '[id]', options_for_select(options)) %>
@@ -47,7 +47,7 @@
 			       <%= error_messages_for('new', :class => 'alert-wrong', :header_message => nil) %>
 			    <% end %>
 				
-				<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + controller.model.resource + '_path'), :method => :post, :html => {:action => self.send('add_associated_' + controller.model.resource + '_path'), :method => 'post'}) do -%>
+				<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => :post, :html => {:action => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => 'post'}) do -%>
 				   <fieldset>
 				   	
 			            <%= hidden_field_tag('association_name', association.name.to_s) %>

@@ -6,10 +6,10 @@
 				<%=
                     value = get_value(list_item, attribute)
 
-	                if (get_value(list_item, list_item.class.default_attribute) == value) and !list_item.class.resource.nil?
-	                    link_to(display_value(list_item, attribute), self.send("#{list_item.class.resource.singularize}_path", list_item))
+	                if (get_value(list_item, list_item.class.crud_star_options[:default_attribute]) == value) and !list_item.class.crud_star_options[:resource].nil?
+	                    link_to(display_value(list_item, attribute), self.send(CrudStar::Utility.path_for_resource(list_item.class), list_item))
 	                else
-	                    display_value(list_item, attribute) || '<em>Undefined</em>'
+	                    display_value(list_item, attribute) || raw('<em>Undefined</em>')
 	                end
                 %>
 			</td>

@@ -1,6 +1,6 @@
 <div id="content">
 	
-    <h2>New <%= controller.model.human_name %></h2>
+    <h2>New <%= controller.model.model_name.human %></h2>
 	
 	<%= display_action_help(controller.model.name, 'new') %>
 	
@@ -8,7 +8,7 @@
 	
 	    <%= error_messages_for('item', :class => 'alert-wrong', :header_message => nil) %>  
 	
-		<% form_tag self.send(controller.model.resource + '_path', :id => @item_id), :method => 'post', :multipart => true do -%>    
+		<% form_tag self.send(CrudStar::Utility.path_for_resource(controller.model), :id => @item_id), :method => 'post', :multipart => true do -%>    
 	 
 		    <fieldset>
 				
@@ -36,7 +36,7 @@
 			</fieldset>
 			
 			<div>
-				<input type="submit" value="Add <%= controller.model.human_name %>" class="button" />    
+				<input type="submit" value="Add <%= controller.model.model_name.human %>" class="button" />    
 		    </div>
 		
 	    <% end -%>
@@ -62,7 +62,7 @@
 <div id="sidebar">
     <h5>Resources</h5>
     <ul id="sidebar-nav">
-        <li><%= link_to 'Cancel', self.send(controller.model.resource + '_path') %></li>
+        <li><%= link_to 'Cancel', self.send(CrudStar::Utility.path_for_resource(controller.model)) %></li>
 		
 		<%
 		  unless controller.sidebar_actions[session[:role]][:new].nil?
