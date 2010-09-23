@@ -1,0 +1,1 @@
+<% unless flash[:errors].nil? or flash[:errors].empty? %>   <div class="alert-wrong">       <% flash[:errors].each do |error| %>          <%= error %>       <% end %>   </div><br /><% end %>

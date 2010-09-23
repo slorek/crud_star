@@ -1,0 +1,91 @@
+<div id="add_associated_<%= association.klass.name.underscore %>"<%= 'style="display: none;"' if flash[:object].nil? or flash[:object].errors.empty? %>">
+	
+	<h4>Add <%= association.klass.name.titleize %></h4>
+	
+	<% if controller.permissions[session[:role]].include? 'new_associated' %>
+		<ul id="associated_tabs">
+	        <li><a onclick="$('associated_existing').show(); $('associated_create').hide();">Existing</a></li>
+	        <li><a onclick="$('associated_existing').hide(); $('associated_create').show();">New</a></li>
+	    </ul>
+	<% end %>
+	
+	<div id="associated_form">
+		<div id="associated_existing">
+			<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + controller.model.resource + '_path'), :method => :post, :html => {:action => self.send('add_associated_' + controller.model.resource + '_path'), :method => 'post'}) do -%>
+		       <fieldset>
+		        
+		            <%= hidden_field_tag('association_name', association.name.to_s) %>
+		            <%= hidden_field_tag('id', @item_id.to_s) %>
+					
+					<%
+					   options = ['Please Select']
+                       association.klass.all.each {|p| options << [ get_value(p, association.klass.default_attribute), p.id ] }
+                    %>
+					
+					<%= select_tag(association.klass.name.underscore + '[id]', options_for_select(options)) %>
+		        
+		            
+		            <div>
+		                <input type="submit" class="button" value="Add <%= association.klass.name.titleize %>" />
+		                or <a href="#" onclick="$('add_associated_<%= association.klass.name.underscore %>').hide(); $('add_associated_<%= association.klass.name.underscore %>_button').show(); return false;">Cancel</a>
+		            </div>
+		            
+		       </fieldset>
+		       
+		    <% end -%>
+		</div>
+		
+		<% if controller.permissions[session[:role]].include? 'new_associated' %>
+		
+			<div id="associated_create" style="display: none;">
+				
+				<%
+			      unless flash[:object].nil?
+			
+			        @new = flash[:object]
+			    %>
+			       <%= error_messages_for('new', :class => 'alert-wrong', :header_message => nil) %>
+			    <% end %>
+				
+				<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + controller.model.resource + '_path'), :method => :post, :html => {:action => self.send('add_associated_' + controller.model.resource + '_path'), :method => 'post'}) do -%>
+				   <fieldset>
+				   	
+			            <%= hidden_field_tag('association_name', association.name.to_s) %>
+			            <%= hidden_field_tag('id', @item_id.to_s) %>
+					
+						<%
+							# Create a new object to enable column and class interrogation when displaying the fields.				    
+							@new_item = association.klass.new
+			                
+			                # Populate the new object with previously-submitted parameters, if applciable (e.g. errors).
+			                unless params[association.klass.name.underscore.to_sym].nil?
+			                    params[association.klass.name.underscore.to_sym].each do |name, value|
+			                        @new_item[name] = value
+			                    end
+						    end
+			                
+			                # Show each field.
+						    association.klass.new_associated_attributes[session[:role]].each do |attribute|
+						%>
+						    <p<%= required_field?(association.klass, attribute) ? ' class="required"' : nil %>>
+							    <%= display_field(@new_item, attribute) %>
+			                    <%= display_field_help(association.klass.name, attribute) %>
+							</p>
+						<% end %>
+						
+						<div>
+							<input type="submit" class="button" value="Add <%= association.klass.name.titleize %>" />
+							or <a href="#" onclick="$('add_associated_<%= association.klass.name.underscore %>').hide(); $('add_associated_<%= association.klass.name.underscore %>_button').show(); return false;">Cancel</a>
+						</div>
+						
+				   </fieldset>
+				   
+				<% end -%>
+			</div>
+		<% end %>
+	</div>
+</div>
+
+<div id="add_associated_<%= association.klass.name.underscore %>_button"<%= 'style="display: none;"' unless flash[:object].nil? %>>
+	<button class="button" onclick="$('add_associated_<%= association.klass.name.underscore %>').show(); $('add_associated_<%= association.klass.name.underscore %>_button').hide(); return false;">Add <%= association.klass.name.titleize %></button>
+</div>

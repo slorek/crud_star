@@ -1,0 +1,211 @@
+body {
+	margin-bottom: 20px;
+}
+
+table {
+}
+
+div.blankStateMessage {
+}
+
+
+/* Table header link selectors for sortable columns.
+ */
+div#content th a {
+    color: white;
+    display: block;
+}
+
+div#content th a:hover {
+    background: transparent;
+    text-decoration: underline;
+}
+
+div#content th img {
+    margin-left: 5px;
+    border: none;
+}
+
+
+/* Table content links.
+ */
+div#content td a {
+    display: block;
+}
+
+div#content td a:hover {
+    background: transparent;
+    text-decoration: underline;
+    color: #5B5E56;
+}
+
+/* Pagination selectors.
+ */
+div#content div.pagination {
+}
+
+div#content div.pagination a,div#content div.pagination em,div#content div.pagination span {
+    padding:3px 10px;
+    float: left;
+    margin-right: 2px;
+}
+
+/* Active links to other pages (includes Next link if not last).
+ */
+div#content div.pagination a {
+    background-color: #dcd9c6;
+    color: #5b5e56;
+    border: 1px solid #dcd9c6;
+    font-weight: bold;
+}
+
+div#content div.pagination a:hover {
+	background-color: #ebe9dc;
+	color: #3c3f36;
+}
+
+/* Disabled page links (current page, and Previous if first page/Next if last).
+ */
+div#content div.pagination em, div#content div.pagination span {
+    border: 1px solid #DCD9C6;
+    color: #5b5e56;
+	font-style: normal;
+}
+
+div#content div.pagination span:hover {
+	cursor: default;
+}
+
+input.date {
+	display: inline;
+}
+
+.calendar_date_select th {                                          
+  padding: 0px;
+  width: 24px;
+  text-align: center;
+}
+
+.calendar_date_select td {                                          
+  padding: 0px;
+}
+
+.calendar_date_select select,.calendar_date_select option {
+	margin: 0;
+}
+
+.calendar_date_select .cds_footer {
+	display: none;
+}
+
+.calendar_date_select .cds_buttons a {
+	font-size: 12px;
+}
+
+.button {
+	cursor: pointer;
+}
+
+.large {
+	height: 150%;
+}
+
+.required label {
+	color: #C05843;
+}
+
+div#errorExplanation {
+    margin-bottom: 18px;
+}
+
+div#errorExplanation p {
+    margin-bottom: 9px;
+}
+
+div#errorExplanation ul {
+    list-style-type: square;
+    list-style-position: inside;
+}
+
+div.form {
+	margin-bottom: 20px;
+}
+
+div.association {
+    padding-top: 20px;
+    border-top: 1px solid #ebe9dc;
+}
+
+div#list ul {
+    margin-left: 10px;
+}
+
+div#list ul {
+    margin-left: 20px;
+	list-style-position: outside;
+    list-style-image: none;
+}
+
+div#list ul li {
+    margin-top: 10px;
+}
+
+
+div#list ul li.top-level {
+}
+
+div#list ul li span.list-item_controls {
+	float: right;
+}
+
+div#list ul li div.label {
+}
+
+div#list ul li div.label a {
+}
+
+div#list ul li.top-level div.top-level-label {
+    padding: 10px;
+    background-color: #ebe9dc;
+}
+
+div#list ul li.expanded {
+    list-style-image: url(/images/crud_star/icon-expanded.png);
+}
+
+label.radio {
+	display: inline;
+}
+
+.loginbutton {
+    cursor: pointer;
+}
+
+div#loginarea div.alert-wrong {
+	margin: 20px;
+}
+
+div#list_filters {
+    border: 1px solid #ebe9dc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+div#list_filters label {
+    display: inline;
+}
+
+div#content.full {
+	width: 100%;
+	margin: 0;
+}
+
+div#content-container {
+	margin: 40px 65px;
+}
+
+div#statistics {
+    border: 1px solid #ebe9dc;
+    padding: 10px;
+    margin-bottom: 10px;
+}

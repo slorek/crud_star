@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+    <head>
+        <title><%= CrudStar::Engine.config.application_name %> Admin</title>
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+		<%= javascript_include_tag :defaults, 'crud_star/application' %>
+		
+        <%= stylesheet_link_tag('crud_star/reset.css') %>
+        <%= stylesheet_link_tag('crud_star/' + CrudStar::Engine.config.theme + '.css') %>
+        <%= stylesheet_link_tag('crud_star/admin.css') %>
+
+		<%= csrf_meta_tag %>
+		
+        <!--[if lte IE 6]>
+            <%= stylesheet_link_tag('crud_star/ie6.css') %>
+        <![endif]-->
+    </head>
+    
+    <body>
+
+        <div id="header">
+            <h1><%= CrudStar::Engine.config.application_name %></h1>
+            <div id="login"><p>Logged in as: <%= session[:username] %> | <%= link_to 'Logout »', send(CrudStar::Engine.config.url_path + '_logout_url') %></p></div>
+            <div class="clear"></div>
+        </div>
+    
+        <div id="navi">
+            <ul id="navtabs">
+            	
+				<%
+                    subnav = nil
+
+				    CrudStar::Engine.config.navigation[session[:role]].each do |tab|
+
+                        if controller.selected_tab == tab
+                            subnav = children
+                        end
+                %>
+				    <li<%= controller.selected_tab == tab ? ' id="current"' : nil %>><%= link_to(tab.to_s, send(CrudStar::Engine.config.url_path + '_' + tab.to_s + '_url')) %></li>
+				<%
+				    end
+                %>
+            </ul>
+            <div class="clear"></div>
+        </div>
+		
+		<% unless subnav.nil? or subnav.empty? %>
+        
+        <div id="subnavi">      
+            <ul id="subnav">
+                <%
+				    subnav.each do |tab|
+
+                        label, link = tab
+                %>
+                    <li<%= controller.selected_menu_option == label ? ' id="sub-current"' : nil %>><%= link_to label, link %></li>
+                <%
+				    end
+                %>
+            </ul>
+            <div class="clear"></div>
+        </div>
+		
+		<% end %>
+        
+        <%= yield -%>
+        
+        <div class="clear"></div>
+        
+    </body>
+</html>

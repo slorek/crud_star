@@ -1,0 +1,73 @@
+<div id="content">
+	
+    <h2><%= controller.selected_menu_option or controller.selected_tab %></h2>
+	
+	<%= display_action_help(controller.model.name, 'index') %>
+	
+	<% if flash[:deleted] %>
+       <p class="alert-ok">The <%= controller.model.human_name.downcase %> has been deleted.</p>
+    <% end %>
+	
+	<% if flash[:notify] %>
+       <p class="alert-ok"><%= flash[:notify] %></p>
+    <% end %>
+	
+	
+	<% unless @list.nil? or @list.empty? %>
+	   
+	   <%= render :partial => @list_filter_partial %>
+	   
+	   <% unless controller.model.export_attributes[session[:role]].nil? %>
+	       <button class="button" onclick="window.location = '<%= url_for :format => :csv, :conditions => params[:conditions] %>'; return false;">Export CSV</button><br /><br />
+	   <% end %>
+	   
+	   <div id="list"><%= render :partial => @list_partial %></div>
+	   
+	<% else %>
+    
+        <div class="blankStateMessage">
+        	
+			<% unless params[:conditions].empty? and params[:search].empty? %>
+			     
+				<%= render :partial => @list_filter_partial %>
+				 
+			    <p class="alert-tip">There are no <%= controller.model.human_name.pluralize.downcase %> which match your filter criteria.</p>
+				 
+			<% else %>
+			
+	            <p class="alert-tip">There are no <%= controller.model.human_name.pluralize.downcase %> added yet.<%
+				 if controller.permissions[session[:role]].include? 'new' %>
+				    Now might be a good time to <%= link_to 'add a ' + controller.model.human_name.downcase, self.send("new_#{controller.model.resource.singularize}_path") %>!<%
+				 end %></p>
+			
+			<% end %>
+        </div>
+    
+    <% end %>
+</div>
+
+<% if controller.permissions[session[:role]].include?('new') or !controller.sidebar_actions[session[:role]][:list].nil? %>
+
+<div id="sidebar">
+    <h5>Resources</h5>
+    <ul id="sidebar-nav">
+    	
+		<%
+		  if controller.permissions[session[:role]].include? 'new'
+        %>		
+            <li><%= link_to 'Add a ' + controller.model.human_name, self.send("new_#{controller.model.resource.singularize}_path") %></li>
+		<%
+		  end
+		%>
+		
+		<%=
+          unless controller.sidebar_actions[session[:role]][:list].nil?
+            controller.sidebar_actions[session[:role]][:list].each do |option|
+        		'<li>' + link_to(option.first, option.last) + '</li>'
+            end
+          end
+        %>
+    </ul>
+</div>
+
+<% end %>

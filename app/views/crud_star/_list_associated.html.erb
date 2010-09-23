@@ -1,0 +1,20 @@
+<%= display_action_help(@list[0].class.name, 'list_associated') %>
+
+<table cellpadding="0" cellspacing="0" border="0">
+	
+    <tbody>
+        <%
+          @list.each do |item|
+
+            url_params = {:id => @item_id.to_s, :association_name => association.name, :item => {:id => item.id}}
+        %>
+	        <tr>
+                <td><a href="<%= self.send(item.class.resource.singularize + '_path', item) %>"><%= get_value(item, item.class.default_attribute) %></a></td>
+				
+				<% if ['edit', 'add_associated', 'delete_associated'].include? controller.action_name %>
+                    <td><%= link_to(image_tag('crud_star/icon-delete.gif', :size => '12x12', :alt => 'Delete'), {:update => 'associated_' + association.klass.name.underscore, :url => self.send('delete_associated_' + controller.model.resource + '_path', url_params), :method => :delete}, {:href => self.send('delete_associated_' + controller.model.resource + '_path', url_params)}, :remote => true) %></td>
+				<% end %>
+	        </tr>
+        <% end %>
+    </tbody>
+</table>

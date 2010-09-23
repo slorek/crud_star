@@ -1,0 +1,107 @@
+<div id="content">
+	
+    <h2>Edit <%= controller.model.human_name %></h2>
+	
+	<%= display_action_help(controller.controller_name, 'edit') %>
+	
+	<% form_tag self.send(controller.model.resource.singularize + '_path', @item), :method => :put, :multipart => true do -%>
+	
+	<% associations = [] %>
+	
+	<div id="edit_form" class="form">
+		
+	    <%= error_messages_for('item', :class => 'alert-wrong', :header_message => nil) %>  
+	
+		    <fieldset>
+				
+				<%
+		          controller.model.edit_attributes[session[:role]].each do |attribute|
+		            
+		            hierarchy = attribute.split('.')
+		
+		            association = get_association(controller.model, attribute)
+		
+		            if association.nil? or ((association.macro == :belongs_to or association.macro == :has_one) and (!association.klass.respond_to?('edit_associated_attributes')))
+		        %>
+		              <p<%= required_field?(controller.model, attribute) ? ' class="required"' : nil %>>
+	                    <%= raw display_field(@item, attribute) %>
+	                    <%= display_field_help(controller.model.name, attribute) %>
+	                  </p>
+		        <%
+		            else
+		                associations << attribute
+		            end
+		          end
+		        %>
+				
+				<%= render(:partial => 'crud_star/' + controller.controller_name + '/edit_custom_fields') if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', @item.class.name.pluralize.underscore, '_edit_custom_fields.html.erb')) %>
+			
+			</fieldset>
+			
+
+    
+    <%
+      associations.each do |attribute|
+        
+        association = get_association(controller.model, attribute)
+
+        if association.belongs_to?
+    %>
+    
+    <h3><%= attribute.split('.').last.titleize %></h3>
+    
+    <table cellpadding="0" cellspacing="0" border="0">
+        
+        <%
+           association.klass.edit_associated_attributes[session[:role]].each do |associated_attribute|
+        %>
+			
+			<p<%= required_field?(association.klass, attribute) ? ' class="required"' : nil %>>
+	            <%= display_field(@item, attribute + '.' + associated_attribute) %>
+	            <%= display_field_help(controller.model.name, associated_attribute) %>
+	        </p>
+        <%
+          end
+        %>
+    </table>
+    
+    <%
+        elsif (association.macro == :has_many) or (association.macro == :has_and_belongs_to_many)
+    %>
+	
+		<div id="associated_<%= association.klass.name.underscore %>" class="association">
+	       <%= render(:partial => get_partial(association.klass.name.pluralize.underscore, 'edit_associated'), :locals => {:association => association}) %>
+		</div>
+    <%
+	    end
+      end
+    %>
+	
+	           <div>
+                <input type="submit" value="Save Changes" class="button" />    
+            </div>
+        
+        <% end -%>
+    </div>
+</div>
+
+<div id="sidebar">
+    <h5>Resources</h5>
+    <ul id="sidebar-nav">
+        <li><%= link_to 'Cancel', self.send(controller.model.resource.singularize + '_path', @item, :cancel => 1) %></li>
+		
+		<% if controller.permissions[session[:role]].include? 'destroy' %>
+            <li><%= link_to 'Delete ' + controller.model.human_name, self.send(controller.model.resource.singularize + '_path', @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.human_name.downcase + '?' %></li>
+		<% end %>
+		
+		<%
+          unless controller.sidebar_actions[session[:role]][:edit].nil?
+            controller.sidebar_actions[session[:role]][:edit].each do |option|
+        %>
+          <li><%= link_to option.first, option.last %></li>
+        <%
+            end
+          end
+        %>
+    </ul>
+</div>

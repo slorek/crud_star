@@ -1,0 +1,77 @@
+<div id="content">
+	
+    <h2>New <%= controller.model.human_name %></h2>
+	
+	<%= display_action_help(controller.model.name, 'new') %>
+	
+	<div id="new_form" class="form">
+	
+	    <%= error_messages_for('item', :class => 'alert-wrong', :header_message => nil) %>  
+	
+		<% form_tag self.send(controller.model.resource + '_path', :id => @item_id), :method => 'post', :multipart => true do -%>    
+	 
+		    <fieldset>
+				
+				<%
+                  @associations = []
+                  
+                  controller.model.new_attributes[session[:role]].each do |attribute|
+                    
+                    # Check if this is an attribute or a belongs_to association.
+                    if controller.model.reflections[attribute.to_sym].nil? or controller.model.reflections[attribute.to_sym].macro == :belongs_to
+                %>
+                  <p<%= required_field?(controller.model, attribute) ? ' class="required"' : nil %>>
+                    <%= display_field(@item, attribute) %>
+                    <%= display_field_help(controller.model.name, attribute) %>
+                  </p>
+                <%
+                    else
+                        @associations << attribute
+                    end
+                  end
+                %>
+				
+				<%= render(:partial => 'crud_star/' + controller.controller_name + '/new_custom_fields') if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', controller.controller_name, '_new_custom_fields.html.erb')) %>
+			
+			</fieldset>
+			
+			<div>
+				<input type="submit" value="Add <%= controller.model.human_name %>" class="button" />    
+		    </div>
+		
+	    <% end -%>
+	</div>
+    
+    <%
+      @associations.each do |attribute|
+        
+        association = controller.model.reflections[attribute.to_sym]
+
+        if (association.macro == :has_many) or (association.macro == :has_and_belongs_to_many)
+    %>
+    
+        <div id="associated_<%= association.klass.name.underscore %>" class="association">
+           <%= render(:partial => get_partial(association.klass.name.pluralize.underscore, 'edit_associated'), :locals => {:association => association}) %>
+        </div>
+    <%
+        end
+      end
+    %>
+</div>
+
+<div id="sidebar">
+    <h5>Resources</h5>
+    <ul id="sidebar-nav">
+        <li><%= link_to 'Cancel', self.send(controller.model.resource + '_path') %></li>
+		
+		<%
+		  unless controller.sidebar_actions[session[:role]][:new].nil?
+            controller.sidebar_actions[session[:role]][:new].each do |option|
+        %>
+          <li><%= link_to option.first, option.last %></li>
+        <%
+            end
+          end
+        %>
+    </ul>
+</div>

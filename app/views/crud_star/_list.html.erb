@@ -1,0 +1,30 @@
+<table cellpadding="0" cellspacing="0" border="0">
+	
+	<% if @list[0].class.respond_to?(:list_attributes) %>
+	    <thead>
+	        <tr>
+	        	<% @list[0].class.list_attributes[session[:role]].each do |attribute| %>
+			
+	                <th><%=
+						
+                        hierarchy = attribute.split('.')
+                        name = hierarchy.last.humanize
+
+	                    if !@list[0].class.resource.nil? and (@list[0].attribute_names.include?(attribute) or (@list[0].class.reflections[hierarchy.first.to_sym]))
+	                        list_header_sortable(name, self.send("#{@list[0].class.resource}_path"), attribute, params[:conditions])
+	                    else
+	                        name
+	                    end
+	                %></th>
+			
+                <% end %>
+	        </tr>
+	    </thead>
+	<% end %>
+	
+    <tbody>
+    	<%= render :partial => get_partial(@list[0].class.name.pluralize.underscore, 'list_item') + '.html', :collection => @list, :as => :list_item %>
+    </tbody>
+</table>
+
+<%= list_pagination_links(@list, self.send("#{@list[0].class.resource}_path")) if !@list[0].class.resource.nil? %>

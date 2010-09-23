@@ -1,0 +1,17 @@
+<h3><%= association.name.to_s.titleize %></h3>
+    
+<%= display_action_help(association.klass.name, 'new_associated') %>
+
+<%
+   # List all of the currently associated items.
+   @list = @item.send(association.name)
+%>
+
+<% unless @list.nil? or @list.empty? %>
+   <div id="<%= association.klass.name.underscore %>_list"><%= render :partial => get_partial(association.klass.name, 'list_associated'), :locals => {:association => association} %></div>
+<% else %>
+    <p>There are no <%= association.klass.name.humanize.pluralize.downcase %> added yet.</p>
+<% end %>
+
+
+<%= render(:partial => get_partial(association.klass.name.pluralize.underscore, 'new_associated'), :locals => {:association => association}) %>
