@@ -1,4 +1,7 @@
-<%= display_action_help(@list[0].class.name, 'list_associated') %>
+<%=
+	partial = CrudStar::Utility.get_action_help(@list[0].class, 'list_associated')
+	render(:partial => partial) unless partial.nil?
+%>
 
 <table cellpadding="0" cellspacing="0" border="0">
 	

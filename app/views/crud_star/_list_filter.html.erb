@@ -2,7 +2,7 @@
 
 <div id="list_filters">
 	
-	<% form_tag CrudStar::Utility.path_for_resource(controller.model), :method => :get do -%>
+	<% form_tag send(CrudStar::Utility.path_for_resources(controller.model)), :method => :get do -%>
 	
 	   <fieldset>
 	   	

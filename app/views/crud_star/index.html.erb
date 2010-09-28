@@ -2,7 +2,10 @@
 	
     <h2><%= controller.selected_menu_option or controller.model.model_name.human.pluralize %></h2>
 	
-	<%= display_action_help(controller.model.name, 'index') %>
+	<%=
+		partial = CrudStar::Utility.get_action_help(controller.model, 'index')
+		render(:partial => partial) unless partial.nil?
+	%>
 	
 	<% if flash[:deleted] %>
        <p class="alert-ok">The <%= controller.model.model_name.human.downcase %> has been deleted.</p>
@@ -21,7 +24,7 @@
 	       <button class="button" onclick="window.location = '<%= url_for :format => :csv, :conditions => params[:conditions] %>'; return false;">Export CSV</button><br /><br />
 	   <% end %>
 	   
-	   <div id="list"><%= render :partial => @list_partial %></div>
+	   <div id="list"><%= render :partial => @list_partial rescue nil %></div>
 	   
 	<% else %>
     

@@ -67,9 +67,12 @@
 			                # Show each field.
 						    association.klass.new_associated_attributes[session[:role]].each do |attribute|
 						%>
-						    <p<%= required_field?(association.klass, attribute) ? ' class="required"' : nil %>>
+						    <p<%= CrudStar::Utility.required_field?(association.klass, attribute) ? ' class="required"' : nil %>>
 							    <%= display_field(@new_item, attribute) %>
-			                    <%= display_field_help(association.klass.name, attribute) %>
+			                    <%=
+									partial = CrudStar::Utility.get_field_help(association.klass, attribute)
+									render(:partial => partial) unless partial.nil?
+								%>
 							</p>
 						<% end %>
 						

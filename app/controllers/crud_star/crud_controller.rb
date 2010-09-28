@@ -114,8 +114,8 @@ module CrudStar
           # Grab the paginated list.
           @list = @list.paginate(:page => params[:page], :per_page => 10)
           
-          @list_partial = get_partial('list')
-          @list_filter_partial = get_partial('list_filter')
+          @list_partial = CrudStar::Utility.get_partial(self.model, 'list')
+          @list_filter_partial = CrudStar::Utility.get_partial(self.model, 'list_filter')
         end
       
         # Only render the list table partial if this is an AJAX request.
@@ -358,7 +358,10 @@ module CrudStar
         end
       
         if request.xhr?
-          render(:partial => FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', association.klass.name.pluralize.underscore, '_edit_associated.html.erb')) ? File.join('admin', association.klass.name.pluralize.underscore, 'edit_associated') : File.join('admin', 'edit_associated'), :locals => {:association => association}, :layout => false)
+          
+          partial = CrudStar::Utility.get_partial(association.klass, 'edit_associated')
+          
+          render(:partial => partial, :locals => {:association => association}, :layout => false)
           flash[:object] = nil
         else
         
@@ -419,7 +422,9 @@ module CrudStar
         end
       
         if request.xhr?
-          render(:partial => FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', association.klass.name.pluralize.underscore, '_edit_associated.html.erb')) ? File.join('admin', association.klass.name.pluralize.underscore, 'edit_associated') : File.join('admin', 'edit_associated'), :locals => {:association => association}, :layout => false)
+          
+          partial = CrudStar::Utility.get_partial(association.klass, 'edit_associated')
+          render(:partial => partial, :locals => {:association => association}, :layout => false)
           flash[:object] = nil
         else
         
@@ -442,21 +447,12 @@ module CrudStar
       # Get a template name to use. Allows over-riding of default template by
       # controller.
       #
-      # TODO: Does not check for SCV templates!
-      #
       def get_template(options = {})
       
         options[:filename] ||= self.action_name
         options[:format] ||= :html
-      
-        FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', self.controller_path, options[:filename].to_s + '.' + options[:format].to_s + '.erb')) ? File.join(self.controller_path, options[:filename].to_s) : File.join('crud_star', options[:filename].to_s)
-      end
-    
-      # Get a partial name to use. Allows over-riding of default partial by
-      # controller.
-      #
-      def get_partial(filename)
-        FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', self.controller_path, '_' + filename + '.html.erb')) ? File.join(self.controller_path, filename) : File.join('crud_star', filename)
+        
+        Rails.root.join('app', 'views', self.controller_path, options[:filename].to_s + '.' + options[:format].to_s + '.erb').exist? ? File.join(self.controller_path, options[:filename].to_s) : File.join('crud_star', options[:filename].to_s)
       end
   end
 end

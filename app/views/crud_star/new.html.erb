@@ -2,7 +2,10 @@
 	
     <h2>New <%= controller.model.model_name.human %></h2>
 	
-	<%= display_action_help(controller.model.name, 'new') %>
+	<%=
+		partial = CrudStar::Utility.get_action_help(controller.model, 'new')
+		render(:partial => partial) unless partial.nil?
+	%>
 	
 	<div id="new_form" class="form">
 	
@@ -20,9 +23,12 @@
                     # Check if this is an attribute or a belongs_to association.
                     if controller.model.reflections[attribute.to_sym].nil? or controller.model.reflections[attribute.to_sym].macro == :belongs_to
                 %>
-                  <p<%= required_field?(controller.model, attribute) ? ' class="required"' : nil %>>
+                  <p<%= CrudStar::Utility.required_field?(controller.model, attribute) ? ' class="required"' : nil %>>
                     <%= display_field(@item, attribute) %>
-                    <%= display_field_help(controller.model.name, attribute) %>
+					<%=
+						partial = CrudStar::Utility.get_field_help(controller.model, attribute)
+						render(:partial => partial) unless partial.nil?
+					%>
                   </p>
                 <%
                     else
@@ -31,7 +37,10 @@
                   end
                 %>
 				
-				<%= render(:partial => 'crud_star/' + controller.controller_name + '/new_custom_fields') if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', controller.controller_name, '_new_custom_fields.html.erb')) %>
+				<%=
+					partial = CrudStar::Utility.get_partial(controller.model, 'new_custom_fields')
+					render(:partial => partial) unless partial.nil?
+				%>
 			
 			</fieldset>
 			
@@ -51,7 +60,7 @@
     %>
     
         <div id="associated_<%= association.klass.name.underscore %>" class="association">
-           <%= render(:partial => get_partial(association.klass.name.pluralize.underscore, 'edit_associated'), :locals => {:association => association}) %>
+           <%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'edit_associated'), :locals => {:association => association}) %>
         </div>
     <%
         end

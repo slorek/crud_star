@@ -11,5 +11,9 @@ if (jQuery) {
 		}).live('ajax:complete', function(xhr) {
 		});
 		
+		// Enable date/time pickers
+		$('input.datetime').datetimepicker({dateFormat: 'MM dd, yy'});
+		$('input.date').datepicker({dateFormat: 'MM dd, yy'});
+		
 	});
 }

@@ -133,11 +133,13 @@ module CrudStar
     # TODO: text, date data types. HABTM associations. Text field class names not being rendered on associated
     #
     def display_field(item, attribute)
-    
-      if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_field_' + attribute.gsub(/\./, '_') + '.html.erb'))
+      
+      partial = CrudStar::Utility.get_field(item.class, attribute)
+      
+      unless partial.nil?
       
         @item = item
-        render(:partial => File.join('admin', item.class.name.pluralize.underscore, 'field_' + attribute.gsub(/\./, '_')))
+        render(:partial => partial)
         
       else
     
@@ -156,12 +158,8 @@ module CrudStar
   
             field_id = item.class.name.underscore + '_' + attribute + '_id'
             field_name = item.class.name.underscore + '[' + attribute + '_id]'
-          
-            if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_select_associated.html.erb'))
-              tag = render(:partial => get_partial(item.class.name.pluralize.underscore, 'select_associated'), :locals => {:field_id => field_id, :field_name => field_name, :selected => value})
-            else
-              tag = select_tag(field_name, options_for_select(association.klass.all.collect {|c| [c.send(c.class.crud_star_options[:default_attribute]), c.to_param] }.insert(0, ''), item.send(attribute).to_param))
-            end
+            
+            tag = render(:partial => CrudStar::Utility.get_partial(item.class, 'select_associated'), :locals => {:field_id => field_id, :field_name => field_name, :selected => item.send(attribute).to_param, :association => association})
           
           else
             tag = display_value(item, attribute)
@@ -176,12 +174,12 @@ module CrudStar
           case column.type
           
             # Display a datetime field as a popup date picker with time.
-            # when :datetime
-            #   tag = calendar_date_select_tag field_name, display_value(item, attribute), :time => true, :minute_interval => 1, :month_year => "label", :class => 'date', :id => item.class.name.underscore + '_' + attribute
+            when :datetime
+              tag = text_field_tag field_name, display_value(item, attribute), :class => 'datetime', :id => item.class.name.underscore + '_' + attribute
           
             # Display a date field as a popup date picker.
-            # when :date
-            #   tag = calendar_date_select_tag field_name, display_value(item, attribute), :month_year => "label", :class => 'date', :id => item.class.name.underscore + '_' + attribute
+            when :date
+              tag = text_field_tag field_name, display_value(item, attribute), :class => 'date', :id => item.class.name.underscore + '_' + attribute
   
             # Display a string field as a text field, the length determined by the
             # column's length metadata.
@@ -253,13 +251,13 @@ module CrudStar
     #
     def display_filter(item, attribute)
       
-      logger.info File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_filter_' + attribute.gsub(/\./, '_') + '.html.erb')
+      partial = CrudStar::Utility.get_filter(item.class, attribute)
       
-      if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_filter_' + attribute.gsub(/\./, '_') + '.html.erb'))
+      unless partial.nil?
           
         @item = item
         @value = params[:conditions][attribute.to_sym]
-        render(:partial => File.join('admin', item.class.name.pluralize.underscore, 'filter_' + attribute.gsub(/\./, '_')))
+        render(:partial => partial)
         
       else
     
@@ -276,12 +274,8 @@ module CrudStar
             field_id = 'conditions_' + attribute + '_id'
             field_name = 'conditions[' + attribute + '_id]'
             selected = params[:conditions][(attribute + '_id').to_sym]
-          
-            if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', item.class.name.pluralize.underscore, '_select_associated.html.erb'))
-              tag = render(:partial => get_partial(item.class.name.pluralize.underscore, 'select_associated'), :locals => {:field_id => field_id, :field_name => field_name})
-            else
-              tag = select_tag(field_name, options_for_select(association.klass.all.collect { |c| [c.send(c.class.crud_star_options[:default_attribute]), c.to_param] }.insert(0, ''), selected))
-            end
+            
+            tag = render(:partial => CrudStar::Utility.get_partial(item.class, 'select_associated'), :locals => {:field_id => field_id, :field_name => field_name, :selected => selected, :association => association})
           end
         
         # Display standard field.
@@ -294,20 +288,20 @@ module CrudStar
           case column.type
           
             # Display a datetime field as a popup date picker with time.
-            # when :datetime
-            # 
-            #   value ||= {'from' => '', 'to' => ''}
-            # 
-            #   tag = '<br />'
-            #   tag += label_tag(field_name + '[from]', 'From:') + ' '
-            #   tag += calendar_date_select_tag field_name + '[from]', value['from'], :time => true, :minute_interval => 1, :month_year => "label", :class => 'date', :id => item.class.name.underscore + '_' + attribute
-            #   tag += '<br />'
-            #   tag += label_tag(field_name + '[to]', 'To:') + ' '
-            #   tag += calendar_date_select_tag field_name + '[to]', value['to'], :time => true, :minute_interval => 1, :month_year => "label", :class => 'date', :id => item.class.name.underscore + '_' + attribute
-          
-            # Display a date field as a popup date picker.
-            # when :date
-            #   tag = calendar_date_select_tag field_name, value, :month_year => "label", :class => 'date', :id => item.class.name.underscore + '_' + attribute
+            when :datetime
+            
+              value ||= {:from => '', :to => ''}
+            
+              tag = '<br />'
+              tag += label_tag(field_name + '[from]', 'From:') + ' '
+              tag += text_field_tag field_name + '[from]', value[:from], :class => 'datetime', :id => item.class.name.underscore + '_' + attribute
+              tag += '<br />'
+              tag += label_tag(field_name + '[to]', 'To:') + ' '
+              tag += text_field_tag field_name + '[to]', value[:to], :class => 'datetime', :id => item.class.name.underscore + '_' + attribute
+                      
+            # # Display a date field as a popup date picker.
+            when :date
+              tag = text_field_tag field_name, value, :class => 'date'
     
             # Display a string field as a text field, the length determined by the
             # column's length metadata.
@@ -379,52 +373,6 @@ module CrudStar
       
         '<label for="' + field_id + '">' + attribute.humanize + '</label> ' + tag
       end
-    end
-  
-  
-    # Displays field help text for a controller action.
-    #
-    # Looks for a view partial file in the format of
-    # '<controller>/_help_<action>.html.erb'.
-    #
-    # If the file does not exist, nothing is displayed.
-    #
-    def display_action_help(class_name, action)
-      render(:partial => File.join('admin', class_name.pluralize.underscore, 'help_' + action)) if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', class_name.pluralize.underscore, '_help_' + action + '.html.erb'))
-    end
-  
-  
-    # Displays field help text for a specified attribute.
-    #
-    # Looks for a view partial file in the format of
-    # '<controller>/_help_<attribute>.html.erb'.
-    #
-    # If the file does not exist, nothing is displayed.
-    #
-    def display_field_help(class_name, attribute)
-      render(:partial => File.join('admin', class_name.pluralize.underscore, 'help_' + attribute)) if FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', class_name.pluralize.underscore, '_help_' + attribute + '.html.erb'))
-    end
-  
-  
-    # Determines whether the specified attribute is a required field.
-    #
-    # Creates and validates an empty new object, and checks if there were any
-    # errors on the specified field.
-    #
-    def required_field?(model, attribute)
-    
-      object = model.new
-      object.valid?
-    
-      error = object.errors.on(attribute.to_sym).nil? ? false : true
-      error ||= object.errors.on((attribute + '_id').to_sym).nil? ? false : true
-    end
-  
-    # Get a partial name to use. Allows over-riding of default partial by
-    # controller.
-    #
-    def get_partial(class_name, filename)
-      FileTest.exists?(File.join(RAILS_ROOT, 'app', 'views', 'admin', class_name.pluralize.underscore, '_' + filename + '.html.erb')) ? File.join('admin', class_name.pluralize.underscore, filename) : File.join('crud_star', filename)
     end
   end
 end

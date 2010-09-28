@@ -23,7 +23,7 @@
 	<% end %>
 	
     <tbody>
-    	<%= render :partial => get_partial(@list[0].class.name.pluralize.underscore, 'list_item') + '.html', :collection => @list, :as => :list_item %>
+    	<%= render :partial => CrudStar::Utility.get_partial(@list[0].class, 'list_item') + '.html', :collection => @list, :as => :list_item %>
     </tbody>
 </table>
 
