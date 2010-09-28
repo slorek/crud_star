@@ -1,0 +1,1 @@
+<%= select_tag(field_name, options_for_select(association.klass.all.collect { |c| [c.send(c.class.crud_star_options[:default_attribute]), c.to_param] }.insert(0, ''), selected)) %>
