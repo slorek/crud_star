@@ -1,5 +1,19 @@
 module CrudStar
   module AdminHelper
+    
+    
+    def navigation_hash
+      
+      nav = CrudStar::Engine.config.navigation
+      
+      if nav.class == Array
+        hash = {}
+        nav.each { |v| hash[v] = []  }
+      end
+      
+      hash ||= nav
+    end
+    
   
     # Generates list headers with list ordering functionality.
     #
@@ -63,23 +77,7 @@ module CrudStar
   
   
   
-    def get_association(model, attribute)
     
-      hierarchy = attribute.to_s.split('.')
-    
-      count = 0
-    
-      while (count < hierarchy.size) do
-      
-        if association = model.reflections[hierarchy[count].to_sym]
-          model = association.klass
-        end
-      
-        count += 1
-      end
-    
-      association
-    end
   
   
   
@@ -294,10 +292,14 @@ module CrudStar
             
               tag = '<br />'
               tag += label_tag(field_name + '[from]', 'From:') + ' '
+              tag += '<span class="datetime">'
               tag += text_field_tag field_name + '[from]', value[:from], :class => 'datetime', :id => item.class.name.underscore + '_' + attribute
+              tag += '</span>'
               tag += '<br />'
               tag += label_tag(field_name + '[to]', 'To:') + ' '
+              tag += '<span class="datetime">'
               tag += text_field_tag field_name + '[to]', value[:to], :class => 'datetime', :id => item.class.name.underscore + '_' + attribute
+              tag += '</span>'
                       
             # # Display a date field as a popup date picker.
             when :date

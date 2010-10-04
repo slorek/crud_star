@@ -12,10 +12,10 @@
 %>
 
 <% unless @list.nil? or @list.empty? %>
-   <div id="<%= association.klass.name.underscore %>_list"><%= render :partial => CrudStar::Utility.get_partial(association.klass, 'list_associated'), :locals => {:association => association} %></div>
+   <div id="<%= association.klass.name.underscore %>_list"><%= render :partial => CrudStar::Utility.get_partial(association.klass, 'list_associated') + '.html', :locals => {:association => association} %></div>
 <% else %>
     <p>There are no <%= association.klass.name.humanize.pluralize.downcase %> added yet.</p>
 <% end %>
 
 
-<%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'new_associated'), :locals => {:association => association}) %>
+<%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'new_associated') + '.html', :locals => {:association => association}) %>

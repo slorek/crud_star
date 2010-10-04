@@ -15,6 +15,8 @@ module CrudStar
     # Hide these controller methods so they are not as accessible as actions.
     # Cannot set as protected or private due to inheritance and view dependance.
     hide_action ['sidebar_actions', 'permissions']
+    
+    before_filter :init
   
     def sidebar_actions
       {:admin => {}}
@@ -27,7 +29,12 @@ module CrudStar
 
   
     # Internal utility methods.
-    protected    
+    protected
+    
+      def init
+        @subnav = nil
+      end
+    
       def validate_login
         if session[:username].nil? or session[:username].empty?
         

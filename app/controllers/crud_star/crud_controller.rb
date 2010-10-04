@@ -422,9 +422,8 @@ module CrudStar
         end
       
         if request.xhr?
-          
           partial = CrudStar::Utility.get_partial(association.klass, 'edit_associated')
-          render(:partial => partial, :locals => {:association => association}, :layout => false)
+          render(:partial => partial + '.html', :locals => {:association => association}, :layout => false)
           flash[:object] = nil
         else
         

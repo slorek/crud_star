@@ -28,6 +28,10 @@ module CrudStar
       Rails.root.join('app', 'views', CrudStar::Engine.config.url_path, model.name.pluralize.parameterize, '_' + filename + '.html.erb').exist? ? File.join(CrudStar::Engine.config.url_path, model.name.pluralize.parameterize, filename) : File.join('crud_star', filename)
     end
     
+    def self.get_template(filename)
+      Rails.root.join('app', 'views', CrudStar::Engine.config.url_path, filename + '.html.erb').exist? ? File.join(CrudStar::Engine.config.url_path,filename) : File.join('crud_star', filename)
+    end
+    
     
     # Displays field help text for a controller action.
     #
@@ -73,6 +77,24 @@ module CrudStar
       error ||= object.errors[(attribute + '_id').to_sym].empty? ? false : true
     end
     
+    
+    def self.get_association(model, attribute)
+    
+      hierarchy = attribute.to_s.split('.')
+    
+      count = 0
+    
+      while (count < hierarchy.size) do
+      
+        if association = model.reflections[hierarchy[count].to_sym]
+          model = association.klass
+        end
+      
+        count += 1
+      end
+    
+      association
+    end
     
   
   end

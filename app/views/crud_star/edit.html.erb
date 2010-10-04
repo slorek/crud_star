@@ -13,46 +13,46 @@
 	
 	<div id="edit_form" class="form">
 		
-	    <%= error_messages_for('item', :class => 'alert-wrong', :header_message => nil) %>  
+		<%= render :partial => 'crud_star/errors', :locals => {:errors => @item.errors.full_messages} unless @item.errors.empty? %>
 	
-		    <fieldset>
-				
-				<%
-		          controller.model.edit_attributes[session[:role]].each do |attribute|
-		            
-		            hierarchy = attribute.split('.')
-		
-		            association = get_association(controller.model, attribute)
-		
-		            if association.nil? or ((association.macro == :belongs_to or association.macro == :has_one) and (!association.klass.respond_to?('edit_associated_attributes')))
-		        %>
-		              <p<%= CrudStar::Utility.required_field?(controller.model, attribute) ? raw(' class="required"') : nil %>>
-	                    <%= raw display_field(@item, attribute) %>
-						<%=
-							partial = CrudStar::Utility.get_field_help(controller.model, attribute)
-							render(:partial => partial) unless partial.nil?
-						%>
-	                  </p>
-		        <%
-		            else
-		                associations << attribute
-		            end
-		          end
-		        %>
-				
-				<%=
-					partial = CrudStar::Utility.get_partial(controller.model, 'edit_custom_fields')
-					render(:partial => partial) unless partial == 'crud_star/edit_custom_fields'
-				%>
-				
-			</fieldset>
+	    <fieldset>
+			
+			<%
+	          controller.model.edit_attributes[session[:role]].each do |attribute|
+	            
+	            hierarchy = attribute.split('.')
+	
+	            association = CrudStar::Utility.get_association(controller.model, attribute)
+	
+	            if association.nil? or ((association.macro == :belongs_to or association.macro == :has_one) and (!association.klass.respond_to?('edit_associated_attributes')))
+	        %>
+	              <p<%= CrudStar::Utility.required_field?(controller.model, attribute) ? raw(' class="required"') : nil %>>
+                    <%= raw display_field(@item, attribute) %>
+					<%=
+						partial = CrudStar::Utility.get_field_help(controller.model, attribute)
+						render(:partial => partial) unless partial.nil?
+					%>
+                  </p>
+	        <%
+	            else
+	                associations << attribute
+	            end
+	          end
+	        %>
+			
+			<%=
+				partial = CrudStar::Utility.get_partial(controller.model, 'edit_custom_fields')
+				render(:partial => partial) unless partial == 'crud_star/edit_custom_fields'
+			%>
+			
+		</fieldset>
 			
 
     
     <%
       associations.each do |attribute|
         
-        association = get_association(controller.model, attribute)
+        association = CrudStar::Utility.get_association(controller.model, attribute)
 
         if association.belongs_to?
     %>
@@ -64,9 +64,8 @@
         <%
            association.klass.edit_associated_attributes[session[:role]].each do |associated_attribute|
         %>
-			
-			<p<%= CrudStar::Utility.required_field?(association.klass, attribute) ? ' class="required"' : nil %>>
-	            <%= display_field(@item, attribute + '.' + associated_attribute) %>
+			<p<%= CrudStar::Utility.required_field?(association.klass, associated_attribute) ? raw(' class="required"') : nil %>>
+	            <%= raw display_field(@item, attribute + '.' + associated_attribute) %>
 				<%=
 					partial = CrudStar::Utility.get_field_help(controller.model, associated_attribute)
 					render(:partial => partial) unless partial.nil?

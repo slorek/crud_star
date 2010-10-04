@@ -13,7 +13,7 @@
 	   <p class="alert-ok"><%= flash[:notify] %></p>
 	<% end %>
 	
-	<%= render :partial => 'crud_star/errors' %> 
+	<%= render :partial => 'crud_star/errors', :locals => {:errors => flash[:errors]} %> 
 
 	<%=
 		partial = CrudStar::Utility.get_action_help(controller.model, 'show')
@@ -29,7 +29,7 @@
             
             hierarchy = attribute.split('.')
 
-            association = get_association(controller.model, attribute)
+            association = CrudStar::Utility.get_association(controller.model, attribute)
 
             if association.nil? or ((association.macro == :belongs_to or association.macro == :has_one) and (!association.klass.respond_to?('view_associated_attributes')))
         %>
@@ -48,7 +48,7 @@
 	<%
       associations.each do |attribute|
         
-        association = get_association(controller.model, attribute)
+        association = CrudStar::Utility.get_association(controller.model, attribute)
 
         if association.belongs_to?
     %>

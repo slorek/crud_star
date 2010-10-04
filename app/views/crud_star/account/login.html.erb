@@ -31,7 +31,7 @@
                 <h3>Welcome to <%= CrudStar::Engine.config.application_name %>. Please log in:</h3>
             </div>
 			
-	        <%= render :partial => 'crud_star/errors' %>
+	        <%= render :partial => 'crud_star/errors', :locals => {:errors => flash[:errors]} %>
             
             <div id="loginform">
                 <% form_tag do -%>

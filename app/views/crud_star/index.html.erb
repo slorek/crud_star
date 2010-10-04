@@ -1,6 +1,6 @@
 <div id="content">
 	
-    <h2><%= controller.selected_menu_option or controller.model.model_name.human.pluralize %></h2>
+    <h2><%= controller.model.model_name.human.pluralize %></h2>
 	
 	<%=
 		partial = CrudStar::Utility.get_action_help(controller.model, 'index')

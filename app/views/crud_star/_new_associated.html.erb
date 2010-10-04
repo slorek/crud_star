@@ -1,4 +1,4 @@
-<div id="add_associated_<%= association.klass.name.underscore %>"<%= 'style="display: none;"' if flash[:object].nil? or flash[:object].errors.empty? %>">
+<div id="add_associated_<%= association.klass.name.underscore %>"<%= raw 'style="display: none;"' if flash[:object].nil? or flash[:object].errors.empty? %>">
 	
 	<h4>Add <%= association.klass.name.titleize %></h4>
 	
@@ -11,7 +11,7 @@
 	
 	<div id="associated_form">
 		<div id="associated_existing">
-			<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => :post, :html => {:action => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => 'post'}) do -%>
+			<% form_tag(:remote => true, :update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => :post, :html => {:action => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => 'post'}) do -%>
 		       <fieldset>
 		        
 		            <%= hidden_field_tag('association_name', association.name.to_s) %>
@@ -90,5 +90,5 @@
 </div>
 
 <div id="add_associated_<%= association.klass.name.underscore %>_button"<%= 'style="display: none;"' unless flash[:object].nil? %>>
-	<button class="button" onclick="$('add_associated_<%= association.klass.name.underscore %>').show(); $('add_associated_<%= association.klass.name.underscore %>_button').hide(); return false;">Add <%= association.klass.name.titleize %></button>
+	<button class="button add_associated">Add <%= association.klass.name.titleize %></button>
 </div>

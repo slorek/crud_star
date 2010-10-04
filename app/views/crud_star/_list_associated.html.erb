@@ -15,7 +15,7 @@
                 <td><a href="<%= self.send(CrudStar::Utility.path_for_resource(item.class), item) %>"><%= get_value(item, item.class.crud_star_options[:default_attribute]) %></a></td>
 				
 				<% if ['edit', 'add_associated', 'delete_associated'].include? controller.action_name %>
-                    <td><%= link_to(image_tag('crud_star/icon-delete.gif', :size => '12x12', :alt => 'Delete'), {:update => 'associated_' + association.klass.name.underscore, :url => self.send('delete_associated_' + CrudStar::Utility.path_for_resource(controller.model), url_params), :method => :delete}, {:href => self.send('delete_associated_' + CrudStar::Utility.path_for_resource(controller.model), url_params)}, :remote => true) %></td>
+                    <td><%= link_to(image_tag('crud_star/icon-delete.gif', :size => '12x12', :alt => 'Delete'), self.send('delete_associated_' + CrudStar::Utility.path_for_resource(controller.model), url_params), :remote => true, :method => :delete, :class => 'delete_associated', :update => 'associated_' + association.klass.name.underscore) %></td>
 				<% end %>
 	        </tr>
         <% end %>

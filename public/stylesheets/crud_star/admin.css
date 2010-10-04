@@ -80,28 +80,6 @@ input.date {
 	display: inline;
 }
 
-.calendar_date_select th {                                          
-  padding: 0px;
-  width: 24px;
-  text-align: center;
-}
-
-.calendar_date_select td {                                          
-  padding: 0px;
-}
-
-.calendar_date_select select,.calendar_date_select option {
-	margin: 0;
-}
-
-.calendar_date_select .cds_footer {
-	display: none;
-}
-
-.calendar_date_select .cds_buttons a {
-	font-size: 12px;
-}
-
 .button {
 	cursor: pointer;
 }
@@ -213,3 +191,12 @@ div#statistics {
 #ui-timepicker-div dl{ text-align: left; }
 #ui-timepicker-div dl dt{ height: 25px; }
 #ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
+
+div#list_filters span.datetime input {
+	display: inline;
+}
+
+div#list_filters span.datetime:after {
+	content: url(/images/crud_star/calendar.gif);
+	padding-left: 5px;
+}

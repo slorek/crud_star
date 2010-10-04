@@ -31,46 +31,32 @@
         <div id="navi">
             <ul id="navtabs">
             	
-				<%
-                    subnav = nil
-
-				    CrudStar::Engine.config.navigation.each do |tab|
-
-                        if controller.controller_name.intern == tab
-                            #subnav = children
-                        end
-
-						if tab == :dashboard
-				%>
-				    <li<%= raw (controller.controller_name == 'index' ? ' id="current"' : nil) %>><%= link_to('Dashboard', self.send(CrudStar::Utility.path_for_resource(tab))) %></li>
-				<%
-                
-						else
-	            %>
-				    <li<%= raw (controller.controller_name.intern == tab ? ' id="current"' : nil) %>><%= link_to(tab.to_s.singularize.camelize.constantize.model_name.human.pluralize, self.send(CrudStar::Utility.path_for_resources(tab))) %></li>
-				<%
-    
+				<% CrudStar::Engine.config.navigation.each_pair do |tab, options| %>
+					
+					<%
+						if !options.empty? and options.include?(controller.controller_name.intern)
+							@subnav = options
 						end
-
-				    end
-                %>
+					%>
+				
+					<% if tab == :dashboard %>
+						<li<%= raw(controller.controller_name == 'index' ? ' id="current"' : nil) %>><%= link_to('Dashboard', self.send(CrudStar::Utility.path_for_resource(tab))) %></li>
+					<% else %>
+						<li<%= raw(((options.empty? and (controller.controller_name.intern == tab)) or (!options.empty? and options.include?(controller.controller_name.intern))) ? ' id="current"' : nil) %>><%= link_to(tab.to_s.singularize.camelize.constantize.model_name.human.pluralize, self.send(CrudStar::Utility.path_for_resources(tab))) %></li>
+					<% end %>
+			    <% end %>
+			
             </ul>
             <div class="clear"></div>
         </div>
 		
-		<% unless subnav.nil? or subnav.empty? %>
+		<% unless @subnav.nil? or @subnav.empty? %>
         
         <div id="subnavi">      
             <ul id="subnav">
-                <%
-				    subnav.each do |tab|
-
-                        label, link = tab
-                %>
-                    <li<%= controller.selected_menu_option == label ? ' id="sub-current"' : nil %>><%= link_to label, link %></li>
-                <%
-				    end
-                %>
+                <% @subnav.each do |tab| %>
+                    <li<%= raw(controller.controller_name.intern == tab ? ' id="sub-current"' : nil) %>><%= link_to(tab.to_s.singularize.camelize.constantize.model_name.human.pluralize, self.send(CrudStar::Utility.path_for_resources(tab))) %></li>
+                <% end %>
             </ul>
             <div class="clear"></div>
         </div>

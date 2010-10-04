@@ -17,5 +17,10 @@ module CrudStar
     initializer "static assets" do |app|
       app.middleware.use ::ActionDispatch::Static, "#{root}/public"
     end
+    
+    # Load rake tasks
+    rake_tasks do
+      load 'crud_star/railties/crud_star.rake'
+    end
   end
 end
