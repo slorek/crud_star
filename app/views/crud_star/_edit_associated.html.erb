@@ -5,10 +5,9 @@
 	render(:partial => partial) unless partial.nil?
 %>
 
-
 <%
    # List all of the currently associated items.
-   @list = @item.send(association.name)
+   @list = @item.send(association.name.to_s)
 %>
 
 <% unless @list.nil? or @list.empty? %>
@@ -18,4 +17,4 @@
 <% end %>
 
 
-<%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'new_associated') + '.html', :locals => {:association => association}) %>
+<%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'new_associated') + '.html', :locals => {:association => association, :attribute => attribute}) %>

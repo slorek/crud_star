@@ -3,7 +3,7 @@
 	<% if @list[0].class.respond_to?(:list_attributes) %>
 	    <thead>
 	        <tr>
-	        	<% @list[0].class.list_attributes[session[:role]].each do |attribute| %>
+	        	<% @list[0].class.list_attributes[session[:crud_star][:role]].each do |attribute| %>
 			
 	                <th><%=
 						

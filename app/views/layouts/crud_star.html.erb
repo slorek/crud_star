@@ -24,16 +24,25 @@
     <body>
         <div id="header">
             <h1><%= CrudStar::Engine.config.application_name %></h1>
-            <div id="login"><p>Logged in as: <%= session[:username] %> | <%= link_to 'Logout »', send(CrudStar::Utility.path_for_resource(:logout)) %></p></div>
+            <div id="login"><p>Logged in as: <%= session[:crud_star][:username] %> | <%= link_to 'Logout »', send(CrudStar::Utility.path_for_resource(:logout)) %></p></div>
             <div class="clear"></div>
         </div>
 		
         <div id="navi">
             <ul id="navtabs">
             	
-				<% CrudStar::Engine.config.navigation.each_pair do |tab, options| %>
+				<% CrudStar::Engine.config.navigation.each do |nav| %>
 					
 					<%
+						options = []
+					
+						if nav.class == Array
+							tab = nav.first
+							options = nav.last
+						else
+							tab = nav
+						end
+						
 						if !options.empty? and options.include?(controller.controller_name.intern)
 							@subnav = options
 						end
@@ -42,7 +51,7 @@
 					<% if tab == :dashboard %>
 						<li<%= raw(controller.controller_name == 'index' ? ' id="current"' : nil) %>><%= link_to('Dashboard', self.send(CrudStar::Utility.path_for_resource(tab))) %></li>
 					<% else %>
-						<li<%= raw(((options.empty? and (controller.controller_name.intern == tab)) or (!options.empty? and options.include?(controller.controller_name.intern))) ? ' id="current"' : nil) %>><%= link_to(tab.to_s.singularize.camelize.constantize.model_name.human.pluralize, self.send(CrudStar::Utility.path_for_resources(tab))) %></li>
+						<li<%= raw(((options.empty? and (controller.controller_name.intern == tab)) or (!options.empty? and options.include?(controller.controller_name.intern))) ? ' id="current"' : nil) %>><%= link_to((tab.class == Symbol ? tab.to_s.singularize.camelize.constantize.model_name.human.pluralize : tab), (tab.class == Symbol ? self.send(CrudStar::Utility.path_for_resources(tab)) : self.send(CrudStar::Utility.path_for_resources(options.first)))) %></li>
 					<% end %>
 			    <% end %>
 			

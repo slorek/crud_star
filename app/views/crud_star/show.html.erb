@@ -25,7 +25,7 @@
 		<%
           associations = []
 
-		  controller.model.view_attributes[session[:role]].each do |attribute|
+		  controller.model.view_attributes[session[:crud_star][:role]].each do |attribute|
             
             hierarchy = attribute.split('.')
 
@@ -58,7 +58,7 @@
 	<table cellpadding="0" cellspacing="0" border="0">
         
         <%
-           association.klass.view_associated_attributes[session[:role]].each do |associated_attribute|
+           association.klass.view_associated_attributes[session[:crud_star][:role]].each do |associated_attribute|
         %>
 	        <tr>
 	            <th><%= associated_attribute.humanize %></th>
@@ -95,18 +95,18 @@
     %>
 </div>
 
-<% if controller.permissions[session[:role]].include?('edit') or controller.permissions[session[:role]].include?('destroy') or !controller.sidebar_actions[session[:role]][:view].nil? %>
+<% if controller.permissions[session[:crud_star][:role]].include?('edit') or controller.permissions[session[:crud_star][:role]].include?('destroy') or !controller.sidebar_actions[session[:crud_star][:role]][:view].nil? %>
 
 <div id="sidebar">
     <h5>Resources</h5>
     <ul id="sidebar-nav">
         <%
-          if controller.permissions[session[:role]].include? 'edit'
+          if controller.permissions[session[:crud_star][:role]].include? 'edit'
         %>
 		  <li><%= link_to 'Edit ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_edit_resource(controller.model), @item) %></li>
         <%
 		  end
-		  if controller.permissions[session[:role]].include? 'destroy'
+		  if controller.permissions[session[:crud_star][:role]].include? 'destroy'
         %>
 		  <li><%= link_to 'Delete ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.model_name.human.downcase + '?' %></li>
 		<%
@@ -114,8 +114,8 @@
 		%>
 		
 		<%
-		  unless controller.sidebar_actions[session[:role]][:view].nil?
-            controller.sidebar_actions[session[:role]][:view].each do |option|
+		  unless controller.sidebar_actions[session[:crud_star][:role]][:view].nil?
+            controller.sidebar_actions[session[:crud_star][:role]][:view].each do |option|
 		%>
 			<li><%= link_to(option.first, option.last) %></li>
 		<%

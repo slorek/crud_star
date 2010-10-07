@@ -1,1 +1,1 @@
-<% unless errors.nil? or errors.empty? %>   <div class="alert-wrong">       <% errors.each do |error| %>          <%= error %>       <% end %>   </div><br /><% end %>
+<% unless errors.nil? or errors.empty? %>   <div class="alert-wrong" id="errorExplanation">		<p>There were problems with the following fields:</p>		<ul>       <% errors.each do |error| %>          <li><%= error %></li>       <% end %>		</ul?>   </div><br /><% end %>

@@ -8,23 +8,25 @@
 	%>
 	
 	<div id="new_form" class="form">
+		
+		<%= render :partial => 'crud_star/errors', :locals => {:errors => @item.errors.full_messages} unless @item.errors.empty? %>
 	
-	    <%= error_messages_for('item', :class => 'alert-wrong', :header_message => nil) %>  
-	
-		<% form_tag self.send(CrudStar::Utility.path_for_resource(controller.model), :id => @item_id), :method => 'post', :multipart => true do -%>    
+		<%= form_tag self.send(CrudStar::Utility.path_for_resources(controller.model)), :method => 'post', :multipart => true %>    
 	 
 		    <fieldset>
+			
+				<%= hidden_field_tag :id, @item_id %>
 				
 				<%
                   @associations = []
                   
-                  controller.model.new_attributes[session[:role]].each do |attribute|
+                  controller.model.new_attributes[session[:crud_star][:role]].each do |attribute|
                     
                     # Check if this is an attribute or a belongs_to association.
                     if controller.model.reflections[attribute.to_sym].nil? or controller.model.reflections[attribute.to_sym].macro == :belongs_to
                 %>
-                  <p<%= CrudStar::Utility.required_field?(controller.model, attribute) ? ' class="required"' : nil %>>
-                    <%= display_field(@item, attribute) %>
+                  <p<%= CrudStar::Utility.required_field?(controller.model, attribute) ? raw(' class="required"') : nil %>>
+                    <%= raw display_field(@item, attribute) %>
 					<%=
 						partial = CrudStar::Utility.get_field_help(controller.model, attribute)
 						render(:partial => partial) unless partial.nil?
@@ -39,7 +41,7 @@
 				
 				<%=
 					partial = CrudStar::Utility.get_partial(controller.model, 'new_custom_fields')
-					render(:partial => partial) unless partial.nil?
+					render(:partial => partial) rescue nil
 				%>
 			
 			</fieldset>
@@ -48,7 +50,7 @@
 				<input type="submit" value="Add <%= controller.model.model_name.human %>" class="button" />    
 		    </div>
 		
-	    <% end -%>
+	    </form>
 	</div>
     
     <%
@@ -60,7 +62,7 @@
     %>
     
         <div id="associated_<%= association.klass.name.underscore %>" class="association">
-           <%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'edit_associated'), :locals => {:association => association}) %>
+           <%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'edit_associated'), :locals => {:association => association, :attribute => attribute}) %>
         </div>
     <%
         end
@@ -71,11 +73,12 @@
 <div id="sidebar">
     <h5>Resources</h5>
     <ul id="sidebar-nav">
-        <li><%= link_to 'Cancel', self.send(CrudStar::Utility.path_for_resource(controller.model)) %></li>
+		
+        <li><%= link_to 'Cancel', self.send(CrudStar::Utility.path_for_resources(controller.model)) %></li>
 		
 		<%
-		  unless controller.sidebar_actions[session[:role]][:new].nil?
-            controller.sidebar_actions[session[:role]][:new].each do |option|
+		  unless controller.sidebar_actions[session[:crud_star][:role]][:new].nil?
+            controller.sidebar_actions[session[:crud_star][:role]][:new].each do |option|
         %>
           <li><%= link_to option.first, option.last %></li>
         <%

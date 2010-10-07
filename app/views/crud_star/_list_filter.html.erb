@@ -12,7 +12,7 @@
          <% end %>
 		
 		 <% if controller.model.respond_to?(:list_filters)
-                controller.model.list_filters[session[:role]].each do |filter| %>
+                controller.model.list_filters[session[:crud_star][:role]].each do |filter| %>
 		   <p><%= raw display_filter(controller.model.new, filter) %></p>
 		 <%   end
             end %>

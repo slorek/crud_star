@@ -1,6 +1,6 @@
 <tr>
     <%
-        list_item.class.list_attributes[session[:role]].each do |attribute| %>
+        list_item.class.list_attributes[session[:crud_star][:role]].each do |attribute| %>
 
             <td>
 				<%=

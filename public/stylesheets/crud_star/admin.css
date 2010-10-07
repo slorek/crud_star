@@ -192,11 +192,11 @@ div#statistics {
 #ui-timepicker-div dl dt{ height: 25px; }
 #ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
 
-div#list_filters span.datetime input {
+span.datetime input, span.date input {
 	display: inline;
 }
 
-div#list_filters span.datetime:after {
+span.datetime:after, span.date:after {
 	content: url(/images/crud_star/calendar.gif);
 	padding-left: 5px;
 }

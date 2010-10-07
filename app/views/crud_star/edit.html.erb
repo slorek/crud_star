@@ -7,7 +7,8 @@
 		render(:partial => partial) unless partial.nil?
 	%>
 	
-	<% form_tag self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :put, :multipart => true do -%>
+	<%= form_tag self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :put, :multipart => true %>
+	
 	
 	<% associations = [] %>
 	
@@ -18,7 +19,7 @@
 	    <fieldset>
 			
 			<%
-	          controller.model.edit_attributes[session[:role]].each do |attribute|
+	          controller.model.edit_attributes[session[:crud_star][:role]].each do |attribute|
 	            
 	            hierarchy = attribute.split('.')
 	
@@ -46,10 +47,13 @@
 			%>
 			
 		</fieldset>
-			
+	
+        <div><input type="submit" value="Save Changes" class="button" /></div>
+    </div>
 
-    
-    <%
+	</form>
+
+	<%
       associations.each do |attribute|
         
         association = CrudStar::Utility.get_association(controller.model, attribute)
@@ -62,7 +66,7 @@
     <table cellpadding="0" cellspacing="0" border="0">
         
         <%
-           association.klass.edit_associated_attributes[session[:role]].each do |associated_attribute|
+           association.klass.edit_associated_attributes[session[:crud_star][:role]].each do |associated_attribute|
         %>
 			<p<%= CrudStar::Utility.required_field?(association.klass, associated_attribute) ? raw(' class="required"') : nil %>>
 	            <%= raw display_field(@item, attribute + '.' + associated_attribute) %>
@@ -81,19 +85,12 @@
     %>
 	
 		<div id="associated_<%= association.klass.name.underscore %>" class="association">
-	       <%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'edit_associated'), :locals => {:association => association}) %>
+	       <%= render(:partial => CrudStar::Utility.get_partial(association.klass, 'edit_associated'), :locals => {:association => association, :attribute => attribute}) %>
 		</div>
     <%
 	    end
       end
     %>
-	
-	           <div>
-                <input type="submit" value="Save Changes" class="button" />    
-            </div>
-        
-        <% end -%>
-    </div>
 </div>
 
 <div id="sidebar">
@@ -101,13 +98,13 @@
     <ul id="sidebar-nav">
         <li><%= link_to 'Cancel', self.send(CrudStar::Utility.path_for_resource(controller.model), @item, :cancel => 1) %></li>
 		
-		<% if controller.permissions[session[:role]].include? 'destroy' %>
+		<% if controller.permissions[session[:crud_star][:role]].include? 'destroy' %>
             <li><%= link_to 'Delete ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_resource(controller.model), @item), :method => :delete, :confirm => 'Are you sure you want to delete this ' + controller.model.model_name.human.downcase + '?' %></li>
 		<% end %>
 		
 		<%
-          unless controller.sidebar_actions[session[:role]][:edit].nil?
-            controller.sidebar_actions[session[:role]][:edit].each do |option|
+          unless controller.sidebar_actions[session[:crud_star][:role]][:edit].nil?
+            controller.sidebar_actions[session[:crud_star][:role]][:edit].each do |option|
         %>
           <li><%= link_to option.first, option.last %></li>
         <%

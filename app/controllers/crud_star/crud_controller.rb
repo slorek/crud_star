@@ -102,7 +102,7 @@ module CrudStar
           order += ' DESC' if params[:desc]
         end
       
-        @list ||= self.model.all(:order => order, :conditions => conditions, :joins => join_tables)
+        @list ||= self.model.all(:order => order, :conditions => conditions, :joins => join_tables, :select => 'distinct ' + self.model.table_name + '.*')
       
         unless params[:search].nil? or params[:search].empty?
           search = self.model.search(params[:search])
@@ -153,14 +153,14 @@ module CrudStar
     def show(conditions = nil, join_tables = [])
     
       # Instantiate the session store for database objects.
-      session[:objects] ||= {}
-      session[:objects][self.model.name.underscore] ||= {}
+      session[:crud_star][:objects] ||= {}
+      session[:crud_star][:objects][self.model.name.underscore] ||= {}
     
       if @item = self.model.find(params[:id], :conditions => conditions, :include => join_tables)
       
         # If the user has been re-directed to here from a 'cancel' button, delete
         # their changes from the session.
-        session[:objects][self.model.name.underscore][@item.id.to_i.to_s] = nil if params[:cancel]
+        session[:crud_star][:objects][self.model.name.underscore][@item.id.to_i.to_s] = nil if params[:cancel]
       
         render(:template => get_template)
       end
@@ -179,8 +179,8 @@ module CrudStar
     def edit
     
       # Instantiate the session store for database objects.
-      session[:objects] ||= {}
-      session[:objects][self.model.name.underscore] ||= {}
+      session[:crud_star][:objects] ||= {}
+      session[:crud_star][:objects][self.model.name.underscore] ||= {}
     
       # Convert to integer and then string. This is so that the add_associated
       # action will work with both new and saved objects.
@@ -190,7 +190,7 @@ module CrudStar
       # associations which are added can be done so without saving immediately. Do
       # not overwrite if it already exists (necessary so non-Ajax requests don't
       # overwrite changes.
-      if @item = session[:objects][self.model.name.underscore][@item_id] ||= self.model.find(@item_id)
+      if @item = session[:crud_star][:objects][self.model.name.underscore][@item_id] ||= self.model.find(@item_id)
         render(:template => get_template)
       end
     end
@@ -207,7 +207,7 @@ module CrudStar
       # ID. This is so that we can get the object from the session.
       id = params[:id].to_i.to_s
     
-      if @item = session[:objects][self.model.name.underscore][id]
+      if @item = session[:crud_star][:objects][self.model.name.underscore][id]
       
         params[self.model.name.underscore].each do |name, value|
         
@@ -218,7 +218,7 @@ module CrudStar
         if @item.valid?
         
           if @item.save
-            session[:objects][self.model.name.underscore][id] = nil
+            session[:crud_star][:objects][self.model.name.underscore][id] = nil
           
             flash[:updated] = true
             redirect_to(send(CrudStar::Utility.path_for_resource(self.model), @item))
@@ -239,14 +239,14 @@ module CrudStar
       @item_id = params[:id] ||= rand(9999).to_s
     
       # Instantiate the session store for database objects.
-      session[:objects] ||= {}
-      session[:objects][self.model.name.underscore] ||= {}    
+      session[:crud_star][:objects] ||= {}
+      session[:crud_star][:objects][self.model.name.underscore] ||= {}    
     
       # Store a current copy of the object in the session, so that any
       # associations which are added can be done so without saving immediately. Do
       # not overwrite if it already exists (necessary so non-Ajax requests don't
       # overwrite changes.
-      @item = session[:objects][self.model.name.underscore][@item_id] ||= self.model.new
+      @item = session[:crud_star][:objects][self.model.name.underscore][@item_id] ||= self.model.new
     
       render(:template => get_template)
     end
@@ -256,7 +256,7 @@ module CrudStar
     
       @item_id = params[:id]
     
-      if @item = session[:objects][self.model.name.underscore][params[:id]]
+      if @item = session[:crud_star][:objects][self.model.name.underscore][params[:id]]
       
         params[self.model.name.underscore].each do |name, value|
           @item[name] = value
@@ -266,7 +266,7 @@ module CrudStar
         
           @item.save
         
-          session[:objects][self.model.name.underscore][params[:id]] = nil
+          session[:crud_star][:objects][self.model.name.underscore][params[:id]] = nil
         
           flash[:created] = true
           redirect_to(self.send(CrudStar::Utility.path_for_resource(self.model), @item))
@@ -292,11 +292,11 @@ module CrudStar
     
       flash[:errors] = []
     
-      if @item = self.model.find(params[:id])
-      
-        if @item.destroy
+      if @item = self.model.find(params[:id].to_i)
+        
+        if @item.destroy.destroyed?
           flash[:deleted] = true
-          redirect_to(CrudStar::Utility.path_for_resources(self.model))
+          redirect_to(self.send(CrudStar::Utility.path_for_resources(self.model)))
         else
           flash[:errors] = flash[:errors] | @item.errors.full_messages
           redirect_to(self.send(CrudStar::Utility.path_for_resource(self.model), @item))
@@ -334,14 +334,18 @@ module CrudStar
       @item_id = params[:id]
     
       # Check that this is a valid association and get the target item.
-      if association = self.model.reflections[params[:association_name].to_sym] and
-        @item = session[:objects][self.model.name.underscore][params[:id]]
+      if association = self.model.reflections[params[:association_name].to_sym] and @item = session[:crud_star][:objects][self.model.name.underscore][params[:id].to_i.to_s]
       
         # Determine whether this is a new or existing item.
         if params[params[:association_name].singularize.to_sym][:id]
 
           unless params[params[:association_name].singularize.to_sym][:id] == 'Please Select'
-            @item.send(params[:association_name]) << association.klass.find(params[params[:association_name].singularize.to_sym][:id])
+            
+            ass_item = association.klass.find(params[params[:association_name].singularize.to_sym][:id])
+            
+            unless @item.send(params[:association_name]).include? ass_item
+              @item.send(params[:association_name]) << ass_item
+            end
           end
         else
         
@@ -361,7 +365,7 @@ module CrudStar
           
           partial = CrudStar::Utility.get_partial(association.klass, 'edit_associated')
           
-          render(:partial => partial, :locals => {:association => association}, :layout => false)
+          render(:partial => partial + '.html', :locals => {:association => association, :attribute => params[:association_name]}, :layout => false)
           flash[:object] = nil
         else
         
@@ -397,7 +401,7 @@ module CrudStar
     
       # Check that this is a valid association and get the target item.
       if association = self.model.reflections[params[:association_name].to_sym] and
-        @item = session[:objects][self.model.name.underscore][params[:id]]
+        @item = session[:crud_star][:objects][self.model.name.underscore][params[:id]]
       
         # Find the item to delete.
         @item.send(params[:association_name]).each do |item|

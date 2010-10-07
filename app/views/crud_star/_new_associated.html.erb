@@ -2,7 +2,7 @@
 	
 	<h4>Add <%= association.klass.name.titleize %></h4>
 	
-	<% if controller.permissions[session[:role]].include? 'new_associated' %>
+	<% if controller.permissions[session[:crud_star][:role]].include? 'new_associated' %>
 		<ul id="associated_tabs">
 	        <li><a onclick="$('associated_existing').show(); $('associated_create').hide();">Existing</a></li>
 	        <li><a onclick="$('associated_existing').hide(); $('associated_create').show();">New</a></li>
@@ -11,7 +11,7 @@
 	
 	<div id="associated_form">
 		<div id="associated_existing">
-			<% form_tag(:remote => true, :update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => :post, :html => {:action => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => 'post'}) do -%>
+			<%= form_tag(self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model), @item_id), :remote => true, :method => :post) %>
 		       <fieldset>
 		        
 		            <%= hidden_field_tag('association_name', association.name.to_s) %>
@@ -19,23 +19,24 @@
 					
 					<%
 					   options = ['Please Select']
-                       association.klass.all.each {|p| options << [ get_value(p, association.klass.crud_star_options[:default_attribute]), p.id ] }
+                       association.klass.all.each {|p|
+						 new_option = association.klass.find p.id
+						
+						 options << [get_value(p, association.klass.crud_star_options[:default_attribute]), p.id] unless @item.send(attribute).include?(new_option)
+					   }
                     %>
 					
 					<%= select_tag(association.klass.name.underscore + '[id]', options_for_select(options)) %>
-		        
-		            
+		        	
 		            <div>
 		                <input type="submit" class="button" value="Add <%= association.klass.name.titleize %>" />
-		                or <a href="#" onclick="$('add_associated_<%= association.klass.name.underscore %>').hide(); $('add_associated_<%= association.klass.name.underscore %>_button').show(); return false;">Cancel</a>
+						or <a href="#" hide="add_associated_<%= association.klass.name.underscore %>" class="cancel">Cancel</a>
 		            </div>
-		            
 		       </fieldset>
-		       
-		    <% end -%>
+		    </form>
 		</div>
 		
-		<% if controller.permissions[session[:role]].include? 'new_associated' %>
+		<% if controller.permissions[session[:crud_star][:role]].include? 'new_associated' %>
 		
 			<div id="associated_create" style="display: none;">
 				
@@ -47,7 +48,7 @@
 			       <%= error_messages_for('new', :class => 'alert-wrong', :header_message => nil) %>
 			    <% end %>
 				
-				<% form_remote_tag(:update => 'associated_' + association.klass.name.underscore, :url => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => :post, :html => {:action => self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :method => 'post'}) do -%>
+				<%= form_tag(self.send('add_associated_' + CrudStar::Utility.path_for_resource(controller.model)), :remote => true, :method => :post) %>
 				   <fieldset>
 				   	
 			            <%= hidden_field_tag('association_name', association.name.to_s) %>
@@ -65,7 +66,7 @@
 						    end
 			                
 			                # Show each field.
-						    association.klass.new_associated_attributes[session[:role]].each do |attribute|
+						    association.klass.new_associated_attributes[session[:crud_star][:role]].each do |attribute|
 						%>
 						    <p<%= CrudStar::Utility.required_field?(association.klass, attribute) ? ' class="required"' : nil %>>
 							    <%= display_field(@new_item, attribute) %>
@@ -78,12 +79,12 @@
 						
 						<div>
 							<input type="submit" class="button" value="Add <%= association.klass.name.titleize %>" />
-							or <a href="#" onclick="$('add_associated_<%= association.klass.name.underscore %>').hide(); $('add_associated_<%= association.klass.name.underscore %>_button').show(); return false;">Cancel</a>
+							or <a href="#" hide="add_associated_<%= association.klass.name.underscore %>" class="cancel">Cancel</a>
 						</div>
 						
 				   </fieldset>
 				   
-				<% end -%>
+				</form>
 			</div>
 		<% end %>
 	</div>

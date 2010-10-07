@@ -173,14 +173,13 @@ module CrudStar
           
             # Display a datetime field as a popup date picker with time.
             when :datetime
-              tag = text_field_tag field_name, display_value(item, attribute), :class => 'datetime', :id => item.class.name.underscore + '_' + attribute
+              tag = '<span class="datetime">' + text_field_tag(field_name, display_value(item, attribute), :class => 'datetime', :id => item.class.name.underscore + '_' + attribute) + '</span>'
           
             # Display a date field as a popup date picker.
             when :date
-              tag = text_field_tag field_name, display_value(item, attribute), :class => 'date', :id => item.class.name.underscore + '_' + attribute
+              tag = '<span class="date">' + text_field_tag(field_name, display_value(item, attribute), :class => 'date', :id => item.class.name.underscore + '_' + attribute) + '</span>'
   
-            # Display a string field as a text field, the length determined by the
-            # column's length metadata.
+            # Display a string field as a text field, the length determined by the column's length metadata.
             when :string
             
               if column.limit <= 15
@@ -216,13 +215,11 @@ module CrudStar
             when :decimal
             
               size = column.limit + 1
-            
               tag = text_field_tag(field_name, display_value(item, attribute), :maxlength => size, :size => size)
               
             when :text
               field_id = field_name
               tag = text_area_tag(field_name, display_value(item, attribute), :size => '100x5')
-              
             
             when :boolean
             
@@ -303,7 +300,7 @@ module CrudStar
                       
             # # Display a date field as a popup date picker.
             when :date
-              tag = text_field_tag field_name, value, :class => 'date'
+              tag = '<span class="date">' + text_field_tag(field_name, value, :class => 'date') + '</span>'
     
             # Display a string field as a text field, the length determined by the
             # column's length metadata.

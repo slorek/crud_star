@@ -32,23 +32,24 @@ module CrudStar
     protected
     
       def init
+        session[:crud_star] ||= {}
         @subnav = nil
       end
     
       def validate_login
-        if session[:username].nil? or session[:username].empty?
+        if session[:crud_star][:username].nil? or session[:crud_star][:username].empty?
         
-          session[:requested_page] = params
-          session[:requested_page][:controller] = '/' + session[:requested_page][:controller]
+          session[:crud_star][:requested_page] = params
+          session[:crud_star][:requested_page][:controller] = '/' + session[:crud_star][:requested_page][:controller]
           
           redirect_to :controller => 'crud_star/account', :action => 'login'
         else
-          session[:requested_page] = nil
+          session[:crud_star][:requested_page] = nil
         end
       end
     
       def validate_access
-        unless permissions[session[:role]].include? self.action_name
+        unless permissions[session[:crud_star][:role]].include? self.action_name
           redirect_to :controller => 'crud_star/index', :action => 'index'
         end
       end
