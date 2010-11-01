@@ -12,6 +12,8 @@ module CrudStar
     config.url_path         = 'admin'
     config.theme            = 'green'
     config.navigation       = :dashboard
+    config.use_cancan       = false
+    config.ability_class    = nil
     
     # Enable the images, stylesheets and JavaScript files to be served in the parent app.
     initializer "static assets" do |app|
