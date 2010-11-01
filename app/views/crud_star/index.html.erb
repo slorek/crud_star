@@ -30,7 +30,7 @@
     
         <div class="blankStateMessage">
         	
-			<% unless params[:conditions].empty? and params[:search].empty? %>
+			<% unless params[:conditions].blank? and params[:search].blank? %>
 			     
 				<%= render :partial => @list_filter_partial %>
 				 
