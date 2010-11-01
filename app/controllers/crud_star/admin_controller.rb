@@ -49,9 +49,20 @@ module CrudStar
       end
     
       def validate_access
-        unless permissions[session[:crud_star][:role]].include? self.action_name
+        unless load_permissions.include? self.action_name
           redirect_to :controller => 'crud_star/index', :action => 'index'
         end
+      end
+
+      def load_permissions
+        perms = permissions
+        unless perms.nil?
+          unless perms[session[:crud_star][:role]].nil?
+            return perms[session[:crud_star][:role]]
+          end
+          raise RuntimeError.new("You need to define #{session[:crud_star][:role]} permissions for #{action_name}")
+        end
+        raise RuntimeError.new("You need to define permissions for #{action_name}")
       end
   end
 end
