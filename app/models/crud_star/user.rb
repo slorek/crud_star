@@ -12,14 +12,17 @@ module CrudStar
     def self.md5(pass)
       Digest::MD5.hexdigest("--sadfsdfa-dsaf874--#{pass}")
     end
-  
-    def before_save
-      self.password = User.md5(password)
-    end
-  
-    def after_find
-      self.password = ''
-    end
+    
+    protected
+      before_save :update_password
+      def update_password
+        self.password = User.md5(password)
+      end
+      
+      after_find :blank_password
+      def blank_password
+        self.password = ''
+      end
   
   end
 end
