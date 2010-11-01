@@ -34,7 +34,7 @@
 	        <%= render :partial => 'crud_star/errors', :locals => {:errors => flash[:errors]} %>
             
             <div id="loginform">
-                <% form_tag do -%>
+                <%= form_tag do -%>
 	                <label for="loginUser">User Name</label>
 					<input type="text" name="user" id="loginUser" class="loginfield" value="<%= params[:user] %>" />
                     <label for="loginPassword">Password</label>
