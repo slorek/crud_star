@@ -7,8 +7,8 @@ module CrudStar
     before_filter :validate_login
     before_filter :validate_access
     
-    helper_method :model
-    hide_action :model
+    helper_method :model, :model_name
+    hide_action :model, :model_name
   
     # Default 'index' action.
     #
@@ -439,14 +439,17 @@ module CrudStar
       end
     end
     
-    
     def model
       controller_name.singularize.camelize.constantize
+    end
+      
+    def model_name
+      model.model_name.human
     end
   
     # Internal utility methods.
     protected
-      
+
       # Get a template name to use. Allows over-riding of default template by
       # controller.
       #

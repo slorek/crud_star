@@ -16,13 +16,20 @@ module CrudStar
     # Cannot set as protected or private due to inheritance and view dependance.
     hide_action ['sidebar_actions', 'permissions']
     
+    helper_method :current_user, :user_has_permission?, :sidebar_actions_for_user
+    
     before_filter :init
   
     def sidebar_actions
       {:admin => {}}
     end
-  
-  
+    
+    def sidebar_actions_for_user(type)
+      actions = sidebar_actions[current_user.role]
+      return [] if actions.nil?
+      sidebar_actions[current_user.role][type] || []
+    end
+
     def permissions
       {:admin => []}
     end
@@ -58,28 +65,32 @@ module CrudStar
           User.where(:username => session[:crud_star][:username]).first
         end
       end
-
-      def check_permissions
+      
+      def user_has_permission?(action)
         if CrudStar::Engine.config.use_cancan
-          check_permissions_from_cancan
+          check_permission_from_cancan(action)
         else
-          check_permissions_from_controller
+          check_permission_from_controller(action)
         end
       end
 
-      def check_permissions_from_cancan
-        CrudStar::Engine.config.ability_class.new(current_user).can?(action_name.to_sym, model)
+      def check_permissions
+        user_has_permission?(action_name)
       end
 
-      def check_permissions_from_controller
+      def check_permission_from_cancan(action)
+        CrudStar::Engine.config.ability_class.new(current_user).can?(action.to_sym, model)
+      end
+
+      def check_permission_from_controller(action)
         perms = permissions
         unless perms.nil?
           unless perms[session[:crud_star][:role].to_sym].nil?
-            return perms[session[:crud_star][:role].to_sym].include?(action_name)
+            return perms[session[:crud_star][:role].to_sym].include?(action)
           end
-          raise RuntimeError.new("You need to define #{session[:crud_star][:role]} permissions for #{action_name}")
+          raise RuntimeError.new("You need to define #{session[:crud_star][:role]} permissions for #{action}")
         end
-        raise RuntimeError.new("You need to define permissions for #{action_name}")
+        raise RuntimeError.new("You need to define permissions for #{action}")
       end
   end
 end
