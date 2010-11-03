@@ -1,6 +1,6 @@
 <div id="content">
 	
-    <h2><%= controller.model.model_name.human.pluralize %></h2>
+  <h2><%= controller.model.model_name.human.pluralize %></h2>
 	
 	<%=
 		partial = CrudStar::Utility.get_action_help(controller.model, 'index')
@@ -8,13 +8,12 @@
 	%>
 	
 	<% if flash[:deleted] %>
-       <p class="alert-ok">The <%= controller.model.model_name.human.downcase %> has been deleted.</p>
-    <% end %>
+     <p class="alert-ok">The <%= controller.model.model_name.human.downcase %> has been deleted.</p>
+  <% end %>
 	
 	<% if flash[:notify] %>
-       <p class="alert-ok"><%= flash[:notify] %></p>
-    <% end %>
-	
+     <p class="alert-ok"><%= flash[:notify] %></p>
+  <% end %>
 	
 	<% unless @list.nil? or @list.empty? %>
 	   
@@ -28,51 +27,41 @@
 	   
 	<% else %>
     
-        <div class="blankStateMessage">
+      <div class="blankStateMessage">
         	
-			<% unless params[:conditions].blank? and params[:search].blank? %>
-			     
-				<%= render :partial => @list_filter_partial %>
-				 
-			    <p class="alert-tip">There are no <%= controller.model.model_name.human.pluralize.downcase %> which match your filter criteria.</p>
-				 
-			<% else %>
-			
-	            <p class="alert-tip">There are no <%= controller.model.model_name.human.pluralize.downcase %> added yet.<%
-				 if controller.permissions[session[:crud_star][:role]].include? 'new' %>
-				    Now might be a good time to <%= link_to 'add a ' + controller.model.model_name.human.downcase, self.send(CrudStar::Utility.path_for_new_resource(controller.model)) %>!<%
-				 end %></p>
-			
-			<% end %>
-        </div>
+        <% unless params[:conditions].blank? and params[:search].blank? %>
+          <%= render :partial => @list_filter_partial %>
+          <p class="alert-tip">There are no <%= controller.model.model_name.human.pluralize.downcase %> which match your filter criteria.</p>
+        <% else %>
+          <p class="alert-tip">
+            There are no <%= controller.model.model_name.human.pluralize.downcase %> added yet.
+            <% if controller.permissions[session[:crud_star][:role]].include? 'new' %>
+                Now might be a good time to <%= link_to 'add a ' + controller.model.model_name.human.downcase, self.send(CrudStar::Utility.path_for_new_resource(controller.model)) %>!
+            <% end %>
+          </p>
+        <% end %>
+
+      </div>
     
-    <% end %>
+  <% end %>
 </div>
 
 <% if controller.permissions[session[:crud_star][:role]].include?('new') or !controller.sidebar_actions[session[:crud_star][:role]][:list].nil? %>
 
-<div id="sidebar">
-    <h5>Resources</h5>
-    <ul id="sidebar-nav">
-    	
-		<%
-		  if controller.permissions[session[:crud_star][:role]].include? 'new'
-        %>		
-            <li><%= link_to 'Add a ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_new_resource(controller.model)) %></li>
-		<%
-		  end
-		%>
-		
-		<%
-          unless controller.sidebar_actions[session[:crud_star][:role]][:list].nil?
-            controller.sidebar_actions[session[:crud_star][:role]][:list].each do |option|
-		%>
-        	<li><%= link_to(option.first, option.last) %></li>
-		<%
-            end
-          end
-        %>
-    </ul>
-</div>
+  <div id="sidebar">
+      <h5>Resources</h5>
+      <ul id="sidebar-nav">
+        
+      <% if controller.permissions[session[:crud_star][:role]].include? 'new' %>
+        <li><%= link_to 'Add a ' + controller.model.model_name.human, self.send(CrudStar::Utility.path_for_new_resource(controller.model)) %></li>
+      <% end %>
+      
+      <% unless controller.sidebar_actions[session[:crud_star][:role]][:list].nil?
+           controller.sidebar_actions[session[:crud_star][:role]][:list].each do |option| %>
+              <li><%= link_to(option.first, option.last) %></li>
+      <%   end
+         end %>
+      </ul>
+  </div>
 
 <% end %>
