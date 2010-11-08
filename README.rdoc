@@ -1,6 +1,8 @@
-= crud_star
+= CRUD*
 
-CrudStar
+A re-usable admin panel framework for Ruby and Rails applications.
+
+This gem is currently *under development* and is not stable. Documentation will follow when the code is ready for general use.
 
 == Note on Patches/Pull Requests
  
