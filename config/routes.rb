@@ -1,6 +1,6 @@
 # Provides default admin routes to the application.
 #
-Rails.application.routes.draw do |map|
+Rails.application.routes.draw do
 
   path = CrudStar::Engine.config.url_path
   
